@@ -1,0 +1,259 @@
+.layui-form-checked[lay-skin='primary'] i {
+    border-color: #0080de !important;
+    background-color: #0080de !important;
+    color: #fff;
+}
+
+.layui-form-checkbox[lay-skin='primary']:hover i {
+    border-color: #0080de !important;
+    color: #fff;
+}
+
+form input {
+    border: none;
+    outline: none;
+}
+
+.login-code input[type='text'] {
+    width: 45%;
+    padding-left: 10px;
+    background-color: white;
+}
+
+.login-code input[type='button'] {
+    width: 50px;
+    cursor: pointer;
+    background: url('/static/img/login/refresh.png') no-repeat center;
+}
+
+.login-wrap {
+    background-image: url('../assets/images/index/login_background.png');
+    background-size: 100%;
+    width: 1920px;
+    height: 1080px;
+
+    .login-form {
+        position: absolute;
+        background-image: url('../assets/images/index/login_from.png');
+        right: 10%;
+        width: 620px;
+        height: 782px;
+        top: 155px;
+        padding: 0 90px;
+        background-size: 100%;
+
+        .login-logo {
+            display: flex;
+            align-items: flex-end;
+            color: #888;
+            font-size: 20px;
+            font-weight: bold;
+            height: 105px;
+            margin-top: 65px;
+            background-repeat: no-repeat;
+            background-position: 50px bottom;
+            justify-content: space-between;
+
+            .login-img {
+                width: 250px;
+                height: 85px;
+                background-image: url('../assets/images/index/login_logo.png');
+                background-size: 100%;
+            }
+
+            span {
+                color: #fff;
+                font-size: 18px;
+            }
+        }
+
+        .login-user {
+            margin-top: 45px;
+            height: 58px;
+            border: 1px solid #347cbe;
+
+            input {
+                height: 100%;
+                border: 1px solid #347cbe;
+                width: 100%;
+                background: #b8c8d6;
+            }
+        }
+
+        .login-password {
+            margin-top: 45px;
+            height: 58px;
+            border: 1px solid #347cbe;
+
+            input {
+                height: 100%;
+                width: 100%;
+                background: #b8c8d6;
+            }
+        }
+
+        .login-code {
+            margin-top: 30px;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+
+            input {
+                height: 50px;
+                border: 1px solid #347cbe;
+                background: #b8c8d6;
+            }
+
+            img {
+                width: 175px;
+                height: 50px;
+            }
+        }
+
+        .login-day {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .logout {
+            margin-top: 60px;
+            height: 60px;
+
+            input {
+                height: 100%;
+                width: 100%;
+                font-size: 22px;
+                color: #fff;
+                background: #2e76b6;
+                cursor: pointer;
+            }
+        }
+
+        .about {
+            color: #fff;
+            font-size: 18px;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid #185a91;
+        }
+
+        .about>div {
+            cursor: pointer;
+        }
+    }
+
+    .product {
+        .el-dialog {
+            background: url('../assets/images/index/login_product.png');
+            background-size: 100% 100%;
+            padding: 0 40px;
+
+            .el-dialog__header {
+                border-bottom: 1px solid #ccdfee;
+                text-align: left;
+                padding: 20px 0;
+
+                .el-dialog__title {
+                    color: #fff;
+                }
+
+                .el-dialog__close {
+                    color: #fff;
+                }
+            }
+
+            .el-dialog__body {
+                text-align: left;
+                padding: 25px 0 0 0;
+                color: #fff;
+
+                ul li {
+                    display: flex;
+                    margin-bottom: 15px;
+
+                    p {
+                        width: 100px;
+                    }
+
+                    textarea {
+                        width: 80%;
+                        height: 108px !important;
+                        line-height: 25px;
+                        padding: 10px 15px;
+                    }
+                }
+            }
+
+            .el-dialog__footer {
+                text-align: center;
+                padding: 0 0 50px 0;
+
+                .el-button {
+                    padding: 0;
+                    width: 1.25rem;
+                    height: 0.4rem;
+                    border-radius: 0;
+                    background: #0080d9;
+                }
+            }
+        }
+    }
+
+    .technology {
+        .el-dialog {
+            background: url('../assets/images/index/login_product.png');
+            background-size: 100% 100%;
+            padding: 0 40px;
+
+            .el-dialog__header {
+                border-bottom: 1px solid #ccdfee;
+                text-align: left;
+                padding: 20px 0;
+
+                .el-dialog__title {
+                    color: #fff;
+                }
+
+                .el-dialog__close {
+                    color: #fff;
+                }
+            }
+
+            .el-dialog__body {
+                text-align: left;
+                padding: 25px 0 35px 0;
+                color: #fff;
+
+                ul li {
+                    display: flex;
+                    margin-bottom: 15px;
+
+                    .title {
+                        font-size: 18px;
+                    }
+
+                    textarea {
+                        width: 80%;
+                        height: 108px !important;
+                        line-height: 25px;
+                        padding: 10px 15px;
+                    }
+                }
+            }
+
+            .el-dialog__footer {
+                text-align: center;
+                padding: 0 0 50px 0;
+
+                .el-button {
+                    padding: 0;
+                    width: 1.25rem;
+                    height: 0.4rem;
+                    border-radius: 0;
+                    background: #0080d9;
+                }
+            }
+        }
+    }
+}
