@@ -1,10 +1,12 @@
 import Api from './apiMethods'
 const baseUrl = '/api/v1/';
 
-export function refreshToken(data= {}){
-    return Api.get(baseUrl+'pub/refresh_token' ,data)
+//获取设备列表
+export function getDevices(data= {}){
+    return Api.get(baseUrl+'setting/devices' ,data)
 }
 
-export function realtime(data = {}) {
-    return Api.get(baseUrl+'realtime', data)
+//添加一项列表
+export function addDevice(data = {}) {
+    return Api.post(baseUrl+'setting/devices', data)
 }

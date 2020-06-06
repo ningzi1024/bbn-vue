@@ -1,5 +1,4 @@
 import axios from 'axios'
-import store from '../store/index'
 import route from '../router/index'
 import cache from '../utils/cache'
 
@@ -12,22 +11,14 @@ const apiConfig = {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
     },
     transformRequest:[function(data,headers){
-        const token = store.state.token || cache.token;
+        let token = localStorage.getItem('token');
         let isDev = process.env.NODE_ENV==dev;
-        let donotLogin = wantNotLogin();
         if(isDev){
-            cache.token = 'fajldjflajl454545646=545adfa='
+            token = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTE5NzExNTQsImlhdCI6MTU5MTI1MTE1NCwibmJmIjoxNTkxMjUxMTU0LCJzdWIiOiIxIn0.BMS4-keRBPOkTtImsX0MwrAjIzQBc2wgVezeTR1v_6O9rUkF8k8m2y9QiDKZMzKI0jHAhbE5s7MrdomgLL6j2w'
             headers['x-custom-authtoken'] = 'MjFmNzg2YWFlN2FlZmEzOWEzNDA3MjIwOGI2NWYwNTU=';
         }
         if(token)
             headers.Authorization = 'Bearer ' + token;
-        else if(donotLogin){ //不需要登录的页面
-            return data;
-        }else{
-            route.push('/login');
-        }
-
-
         return data;
     }, function(err){
         return err;
@@ -55,22 +46,6 @@ const apiConfig = {
         }
     }]
 };
-
-/**
- * 是否是不需要登录的路由
- * @returns {boolean}
- */
-function wantNotLogin() {
-    let notLoginArrRoute = ['login'],
-        flag = false;
-    notLoginArrRoute.map(item=>{
-        let routeName = route.history.current.name;
-        console.log(route);
-        if(item==routeName)
-            flag = true;
-    })
-    return flag;
-}
 
 const instance  = axios.create(apiConfig);
 export default instance;
