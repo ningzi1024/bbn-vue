@@ -101,13 +101,17 @@
                         label="被动连接注册包"
                         prop="registration_package">
                 </el-table-column>
-                <el-table-column
-                        label="被动链接"
-                        prop="">
+                <el-table-column abel="被动链接">
+                    <template slot-scope="scope">
+                        <el-checkbox v-model="tableDataByKeys[scope.row.id][`passive_enable_${scope.row.id}`]" @change="((val)=>{inputName(val, scope.row.id, 'passive_enable_')})"></el-checkbox>
+                    </template>
                 </el-table-column>
-                <el-table-column
-                        label="联系人组"
-                        prop="">
+                <el-table-column label="联系人组">
+                    <template slot-scope="scope">
+                        <div style="cursor:pointer">
+                            <i class="el-icon-s-order" @click="selectContactGroups(scope.row.id)"></i>
+                        </div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                         label="监控项"
@@ -119,12 +123,15 @@
                 </el-table-column>
             </el-table>
         </div>
+        <ContactGroups 
+            :show="contactGroupsShow" @callBack="getDeviceContact"/>
     </div>
 </template>
 
 <script>
 import { getDevices } from '../services/services'
-import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn } from 'element-ui'
+import ContactGroups from '../components/contact_groups'
+import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox } from 'element-ui'
 export default {
     name: 'home',
     components: {
@@ -136,7 +143,9 @@ export default {
         [Badge.name]: Badge,
         [Tooltip.name]: Tooltip,
         [Table.name]: Table,
-        [TableColumn.name]: TableColumn
+        [TableColumn.name]: TableColumn,
+        [Checkbox.name]: Checkbox,
+        ContactGroups
     },
     data(){
         return {
@@ -148,59 +157,61 @@ export default {
             sites: [],                  //站点数据
             types: [],                  //类型数据
             tableData: [
-                // {
-                //     "id": 24,
-                //     "name": "新建主机1",
-                //     "device_group": "",
-                //     "device_group_id": 0,
-                //     "sort": "",
-                //     "port": 1985,
-                //     "ip_address": "192.168.1.110",
-                //     "485_address": 0,
-                //     "connection": true,
-                //     "registration_package": "3",
-                //     "device_groups": [
-                //         {
-                //             "id": 8,
-                //             "name": "广东总部机房"
-                //         },
-                //         {
-                //             "id": 7,
-                //             "name": "1513512"
-                //         },
-                //         {
-                //             "id": 6,
-                //             "name": "新增项3"
-                //         },
-                //         {
-                //             "id": 3,
-                //             "name": "东莞机房"
-                //         },
-                //         {
-                //             "id": 2,
-                //             "name": "广东机房"
-                //         },
-                //         {
-                //             "id": 1,
-                //             "name": "北京机房"
-                //         }
-                //     ],
-                //     "check_interval": 10,
-                //     "retry_count": 3,
-                //     "check_time_period": "",
-                //     "check_time_period_id": 3,
-                //     "notifications_time_period": "",
-                //     "notifications_time_period_id": 2,
-                //     "notifications_interval": 3600,
-                //     "protocol": "cell",
-                //     "notifications_enable": true,
-                //     "device_enabled": true,
-                //     "zigbee_enabled": false,
-                //     "physical_address": "",
-                //     "contact_groups": []
-                // }
+                {
+                    "id": 24,
+                    "name": "新建主机1",
+                    "device_group": "",
+                    "device_group_id": 0,
+                    "sort": "",
+                    "port": 1985,
+                    "ip_address": "192.168.1.110",
+                    "485_address": 0,
+                    "connection": true,
+                    "registration_package": "3",
+                    "device_groups": [
+                        {
+                            "id": 8,
+                            "name": "广东总部机房"
+                        },
+                        {
+                            "id": 7,
+                            "name": "1513512"
+                        },
+                        {
+                            "id": 6,
+                            "name": "新增项3"
+                        },
+                        {
+                            "id": 3,
+                            "name": "东莞机房"
+                        },
+                        {
+                            "id": 2,
+                            "name": "广东机房"
+                        },
+                        {
+                            "id": 1,
+                            "name": "北京机房"
+                        }
+                    ],
+                    "check_interval": 10,
+                    "retry_count": 3,
+                    "check_time_period": "",
+                    "check_time_period_id": 3,
+                    "notifications_time_period": "",
+                    "notifications_time_period_id": 2,
+                    "notifications_interval": 3600,
+                    "protocol": "cell",
+                    "passive_enable": true, 
+                    "notifications_enable": true,
+                    "device_enabled": true,
+                    "zigbee_enabled": false,
+                    "physical_address": "",
+                    "contact_groups": []
+                }
             ],              //表格数据
-            tableDataByKeys:{}          //以id为key，对应表格数据的map，核心数据
+            tableDataByKeys:{},          //以id为key，对应表格数据的map，核心数据
+            contactGroupsShow: false    //打开选择联系人弹框
         }
     },
     mounted() {
@@ -211,22 +222,58 @@ export default {
          * 获取初始化数据
          */
         init(){
-            getDevices().then(res=>{
-                this.tableData = res.data;
-                let obj = {};
-                res.data && res.data.map(item=>{
-                    if(!obj[item.id]){
-                        obj[item.id] = item;
-                        obj[item.id][`name_${item.id}`] = item.name;  //设备名称model
-                        obj[item.id][`ip_address_${item.id}`] = item.ip_address;  //IP地址 model
-                        obj[item.id][`port_${item.id}`] = item.port;  //端口号 model
-                        obj[item.id][`485_address_${item.id}`] = item['485_address'];  //协议id model
-                        obj[item.id][`device_group_id_${item.id}`] = item.device_group_id>0?item.device_group_id:"";  //设备名称model
-                    }
-                })
-                this.tableDataByKeys = obj;
-                console.log(this.tableDataByKeys);
+            // getDevices().then(res=>{
+            //     this.tableData = res.data;
+            //     let obj = {};
+            //     res.data && res.data.map(item=>{
+            //         if(!obj[item.id]){
+            //             obj[item.id] = item;
+            //             obj[item.id][`name_${item.id}`] = item.name;  //设备名称model
+            //             obj[item.id][`ip_address_${item.id}`] = item.ip_address;  //IP地址 model
+            //             obj[item.id][`port_${item.id}`] = item.port;  //端口号 model
+            //             obj[item.id][`485_address_${item.id}`] = item['485_address'];  //协议id model
+            //             obj[item.id][`device_group_id_${item.id}`] = item.device_group_id>0?item.device_group_id:"";  //设备名称model
+            //         }
+            //     })
+            //     this.tableDataByKeys = obj;
+            //     console.log(this.tableDataByKeys);
+            // })
+
+            this.tableDataByKeys = this.getPageTableData(this.tableData);
+        },
+
+        /**
+         * 点击打开选择联系人组
+         */
+        selectContactGroups(id){
+            if(!id) return;
+            this.contactGroupsShow = true;
+        },
+
+        getDeviceContact(data){
+            console.log(data);
+            if(data.show!==undefined)
+                this.contactGroupsShow = data.show;
+        },
+
+        /**
+         * 获取页面维护数据
+         */
+        getPageTableData(arr){
+            if(!arr || arr.length<=0) return {};
+            let obj = {};
+            arr.map(item=>{
+                if(!obj[item.id]){
+                    obj[item.id] = item;
+                    obj[item.id][`name_${item.id}`] = item.name;  //设备名称model
+                    obj[item.id][`ip_address_${item.id}`] = item.ip_address;  //IP地址 model
+                    obj[item.id][`port_${item.id}`] = item.port;  //端口号 model
+                    obj[item.id][`485_address_${item.id}`] = item['485_address'];  //协议id model
+                    obj[item.id][`passive_enable_${item.id}`] = item['passive_enable'];
+                    obj[item.id][`device_group_id_${item.id}`] = item.device_group_id>0?item.device_group_id:"";  //设备名称model
+                }
             })
+            return obj;
         },
 
         saveHandle(){
@@ -256,6 +303,7 @@ export default {
 .setting-device-wrap
     padding 40px
     text-align left
+    font-size   12px
     .selectCon
         margin 0 8px
     .input-keyword
@@ -272,9 +320,11 @@ export default {
         width 100%
         margin-top 15px
         table
+            font-size   12px
             th
                 background-color #54b5ff
                 color #fff
+                font-weight normal 
             .el-input
                 width 80%
 </style>
