@@ -137,11 +137,14 @@ export default {
     height auto;
     .el-dialog__header
         background #2fa1f7
-        padding 15px 20px 10px
+        padding 12px 20px 8px
         .el-dialog__title
             color #fff
-        .el-dialog__headerbtn .el-dialog__close
-            color #fff
+            font-size 15px
+        .el-dialog__headerbtn 
+            top 12px
+            .el-dialog__close
+                color #fff
     .el-dialog__body
         padding 15px 8px
     table
