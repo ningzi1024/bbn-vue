@@ -1,6 +1,4 @@
 import axios from 'axios'
-import route from '../router/index'
-import cache from '../utils/cache'
 
 const dev = "development";
 

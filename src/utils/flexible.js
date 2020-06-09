@@ -4,7 +4,6 @@
         let _screenWidth = 1920
         const baseSize = 100;
         const scale = docEl.offsetWidth/_screenWidth
-        console.log(scale);
         let rem = baseSize * Math.min(scale, 2)
         docEl.style.fontSize = rem + 'px'
     }

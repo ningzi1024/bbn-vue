@@ -1,7 +1,7 @@
 <template>
     <div class="contact_groups">
         <el-dialog
-                title="选择联系组"
+                :title="`选择联系组 【${localData && localData.name}】`"
                 :visible="dialogVisible"
                 width="370px"
                 @close="btnCancel"

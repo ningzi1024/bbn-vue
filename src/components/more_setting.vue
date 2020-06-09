@@ -1,18 +1,18 @@
 <template>
     <div class="more-setting-wrap">
         <el-dialog
-                title="更多设置"
+                :title="`更多设置 【${localData && localData.name}】`"
                 :visible="show"
-                width="320px"
-                @close="btnCancel"
-                :close-on-click-modal="false">
+                width="360px"
+                :close-on-click-modal="false"
+                @close="btnCancel">
             <table class="more-setting-tab">
                 <tr>
-                    <td>检查间隔/秒</td>
+                    <td width="25%">检查间隔/秒</td>
                     <td>
                         <el-input
                             v-model="moreData.check_interval"
-                            @input="inputName">
+                            @input="(val)=>inputName(val, 'check_interval')">
                         </el-input>
                     </td>
                 </tr>
@@ -21,14 +21,16 @@
                     <td>
                         <el-input
                             v-model="moreData.retry_count"
-                            @input="inputName">
+                            @input="(val)=>inputName(val, 'retry_count')">
                         </el-input>
                     </td>
                 </tr>
                 <tr>
                     <td>检查时间段</td>
                     <td>
-                        <el-select v-model="moreData.check_time_period_id">
+                        <el-select
+                                v-model="check_time_period_name"
+                                @change="(val)=>selectVal(val, 'check_time_period_id')">
                             <el-option
                                     v-for="item in check_time_period"
                                     :key="item.name"
@@ -41,7 +43,9 @@
                 <tr>
                     <td>通知时间段</td>
                     <td>
-                        <el-select v-model="moreData.notifications_time_period_id">
+                        <el-select
+                                v-model="notifications_time_period_name"
+                                @change="(val)=>selectVal(val, 'notifications_time_period_id')">
                             <el-option
                                     v-for="item in notifications_time_period"
                                     :key="item.name"
@@ -56,7 +60,7 @@
                     <td>
                         <el-input
                             v-model="moreData.notifications_interval"
-                            @input="inputName">
+                            @input="(val)=>inputName(val, 'notifications_interval')">
                         </el-input>
                     </td>
                 </tr>
@@ -65,7 +69,7 @@
                     <td>
                         <el-input
                             v-model="moreData.protocol"
-                            @input="inputName">
+                            @input="(val)=>inputName(val, 'protocol')">
                         </el-input>
                         
                     </td>
@@ -99,6 +103,7 @@
 
 <script>
 import { Dialog, Button, Checkbox, Input,Select, Option } from 'element-ui'
+import { timePeriods } from '../services/services'
 export default {
     name: 'more-setting',
     props:{
@@ -132,10 +137,30 @@ export default {
                 protocol:'',
                 notifications_enable: true,
                 zigbee_enabled: false,
-
             },
             check_time_period:[],
-            notifications_time_period:[]
+            check_time_period_name: '',
+            notifications_time_period:[],
+            notifications_time_period_name:''
+        }
+    },
+    mounted() {
+
+    },
+    watch: {
+        localData(newVal){
+            console.log(newVal);
+            if(newVal){
+                let { localData, moreData } = this;
+                localData = newVal;
+                if(localData){
+                    for(let key in moreData){
+                        moreData[key] = localData[key];
+                    }
+                    this.moreData = moreData;
+                }
+                this.getTimePeriods();
+            }
         }
     },
     methods: {
@@ -143,25 +168,104 @@ export default {
          * 关闭弹窗
          */
         btnCancel(){
-            this.moreData = {};
+            this.resetData();
             this.$emit('update:show', false);
         },
+
+        /**
+         * 确认按钮事件，向父组件派发事件
+         */
         btnSure(){
             if(!this.localData.id) return;
-            let data = {
-                id: this.localData.id,
-                moreSetting: this.moreData
-            };
-            this.$emit('callBack', data);
-            this.btnCancel();
+            if(this.checkData()){
+                let data = {
+                    id: this.localData.id,
+                    moreSetting: this.moreData
+                };
+                this.$emit('callBack', data);
+                this.btnCancel();
+            }
         },
 
+        /**
+         * 更新input组件的model
+         * @param val
+         * @param key
+         */
         inputName(val, key){
             if(val){
                 this.moreData[key] = val;
                 console.log(val);
             }
+        },
+
+        getTimePeriods(){
+            timePeriods().then(res=>{
+                let data = res.data;
+                if(data){
+                    this.check_time_period = data;
+                    this.notifications_time_period = data;
+                    data.map(item=>{
+                       if(item.id === this.localData.check_time_period_id){
+                         this.check_time_period_name = item.name;
+                       }
+                        if(item.id === this.localData.notifications_time_period_id){
+                            this.notifications_time_period_name = item.name;
+                        }
+                    });
+                }
+            }).catch(()=>{
+                console.log('网络异常');
+            })
+        },
+
+        /**
+         * 组件数据回到初始化设置
+         */
+        resetData(){
+            //清空组件数据
+            this.moreData = {
+                check_interval: 0,
+                retry_count:0,
+                check_time_period_id: 0,
+                notifications_time_period_id:0,
+                notifications_interval:3600,
+                protocol:'',
+                notifications_enable: true,
+                zigbee_enabled: false,
+            };
+            this.check_time_period = [];
+            this.check_time_period_name = '';
+            this.notifications_time_period = [];
+            this.notifications_time_period_name = '';
+        },
+
+        /**
+         * 下拉框更新数据
+         * @param val
+         * @param prefix
+         */
+        selectVal(val, prefix){
+            if(val && prefix){
+                this.moreData[prefix] = val;
+            }
+            console.log(val, prefix);
+        },
+
+        checkData(){
+            let { moreData } = this;
+            if(!moreData.check_time_period_id){
+                this.$message.error('请选择检查时间段！');
+                return false
+            }else if(!moreData.notifications_time_period_id){
+                this.$message.error('请选择通知时间段！');
+                return false
+            }
+            return true;
         }
+    },
+    beforeDestroy() {
+        this.resetData();
     }
 }
 </script>
@@ -180,5 +284,15 @@ export default {
             .el-dialog__close
                 color #fff
     .el-dialog__body
-        padding 15px 8px
+        padding 15px
+    .more-setting-tab
+        text-align left
+        padding 5px 20px
+        overflow hidden
+        td
+            padding 6px 0
+            &:nth-child(1)
+                text-align right
+            &:nth-child(2)
+                padding-left 15px
 </style>

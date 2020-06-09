@@ -1,28 +1,8 @@
 <template>
     <div class="setting-device-wrap">
+
         <div class="opts">
-            <el-select v-model="searchParams.site" placeholder="查找站点">
-                <el-option
-                        v-for="item in searchParams.sites"
-                        :key="item.name"
-                        :label="item.name"
-                        :value="item.id">
-                </el-option>
-            </el-select>
-            <el-select v-model="searchParams.types" placeholder="查找类型" class="selectCon">
-                <el-option
-                        v-for="item in searchParams.types"
-                        :key="item.value"
-                        :label="item.value"
-                        :value="item.value">
-                </el-option>
-            </el-select>
-            <div class="input-keyword">
-                <el-input placeholder="请输入内容" v-model="searchParams.keywords" class="input-with-select">
-                    <el-button slot="append" icon="el-icon-search"></el-button>
-                </el-input>
-            </div>
-            <el-button icon="el-icon-delete">清除</el-button>
+            <Search type="DEVICES" @searchEvent="searchEvent"/>
             <div class="btnIcons">
                 <el-button-group>
                     <el-tooltip effect="dark" content="增加">
@@ -45,22 +25,28 @@
         <div class="content-tab">
             <el-table
                    :data="tableData"
+                   stripe
                    style="width: 100%"
                    border>
                 <el-table-column type="selection"/>
                 <el-table-column
+                        width="180"
                        label="设备名称">
                     <template slot-scope="scope">
                         <el-input
+                                size="small"
                                 v-model="tableDataByKeys[scope.row.id][`name_${scope.row.id}`]"
                                 class="input-with-select"
                                 @input="((val)=>{inputName(val, scope.row.id, 'name_')})">
                         </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column label="站点">
+                <el-table-column label="站点"  width="200">
                     <template slot-scope="scope">
-                        <el-select v-model="tableDataByKeys[scope.row.id][`device_group_id_${scope.row.id}`]" placeholder="请选择机房">
+                        <el-select
+                                size="small"
+                                v-model="tableDataByKeys[scope.row.id][`device_group_id_${scope.row.id}`]"
+                                placeholder="请选择机房">
                             <el-option
                                     v-for="item in scope.row.device_groups"
                                     :key="item.name"
@@ -73,6 +59,7 @@
                 <el-table-column label="分类">
                     <template slot-scope="scope">
                         <el-input
+                                size="small"
                                 v-model="tableDataByKeys[scope.row.id][`sort_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, 'sort_')})">
                         </el-input>
@@ -81,6 +68,7 @@
                 <el-table-column label="IP地址">
                     <template slot-scope="scope">
                         <el-input
+                                size="small"
                                 v-model="tableDataByKeys[scope.row.id][`ip_address_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, 'ip_address_')})">
                         </el-input>
@@ -89,6 +77,7 @@
                 <el-table-column label="端口号">
                     <template slot-scope="scope">
                         <el-input
+                                size="small"
                                 v-model="tableDataByKeys[scope.row.id][`port_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, 'port_')})">
                         </el-input>
@@ -97,6 +86,7 @@
                 <el-table-column label="协议ID">
                     <template slot-scope="scope">
                         <el-input
+                                size="small"
                                 v-model="tableDataByKeys[scope.row.id][`485_address_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, '485_address_')})">
                         </el-input>
@@ -105,6 +95,7 @@
                 <el-table-column label="被动连接注册包">
                     <template slot-scope="scope">
                         <el-input
+                                size="small"
                                 v-model="tableDataByKeys[scope.row.id][`registration_package_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, 'registration_package_')})">
                         </el-input>
@@ -139,15 +130,29 @@
             </el-table>
         </div>
 
+        <!--        分页组件-->
+        <el-pagination
+                background
+                layout="prev, pager, next"
+                :total="pages.total"
+                :page-size="pages.pageSize"
+                @current-change = "changePage"
+                class="pages">
+        </el-pagination>
+
+        <!--        联系人组组件-->
         <ContactGroups 
             :show.sync = "contactGroupsShow"
             :localData = "curTdData"
             @callBack = "getDeviceContact" />
 
+        <!--        更多设置组件-->
         <MoreSetting 
         :show.sync = "showMoreSettingFlag" 
         :localData = "curTdData" 
-        @callBack = "getMoreSetting"/>     
+        @callBack = "getMoreSetting"/>
+
+        <Monitorings />
     </div>
 </template>
 
@@ -155,7 +160,9 @@
 import { getDevices } from '../services/services'
 import ContactGroups from '../components/contact_groups'
 import MoreSetting from '../components/more_setting'
-import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox } from 'element-ui'
+import Search from '../components/search'
+import Monitorings from '../components/monitoring_groups'
+import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox, Pagination } from 'element-ui'
 export default {
     name: 'home',
     components: {
@@ -169,8 +176,11 @@ export default {
         [Table.name]: Table,
         [TableColumn.name]: TableColumn,
         [Checkbox.name]: Checkbox,
+        [Pagination.name]: Pagination,
         ContactGroups,
-        MoreSetting
+        MoreSetting,
+        Search,
+        Monitorings
     },
     data(){
         return {
@@ -179,8 +189,11 @@ export default {
                 type: '',
                 keywords: ''
             },
-            sites: [],                  //站点数据
-            types: [],                  //类型数据
+            pages: {
+                total: 10,
+                pageSize: 10,
+                currentPage:1
+            },
             tableData: [
                 {
                     "id": 24,
@@ -249,12 +262,18 @@ export default {
          * 获取初始化数据
          */
         init(){
-            // getDevices().then(res=>{
-            //     this.tableData = res.data;
-            //     this.tableDataByKeys = this.getPageTableData(res.data);
-            // })
+            let { pages } = this;
+            let params = {
+                page: pages.currentPage,
+                limit: pages.pageSize
+            };
+            getDevices(params).then(res=>{
+                this.pages.total = res.total;
+                this.tableData = res.data;
+                this.tableDataByKeys = this.getPageTableData(res.data);
+            })
 
-            this.tableDataByKeys = this.getPageTableData(this.tableData);
+            // this.tableDataByKeys = this.getPageTableData(this.tableData);
         },
 
         /**
@@ -273,7 +292,6 @@ export default {
             if(!arr || arr.length<=0) return {};
             let obj = {};
             arr.map(item=>{
-                console.log(item['passive_enable']);
                 if(!obj[item.id]){
                     obj[item.id] = item;
                     obj[item.id][`name_${item.id}`] = item.name;  //设备名称model
@@ -304,12 +322,16 @@ export default {
         inputName(value,id, prefix){
             prefix = prefix || 'name_';
             let keysTable = this.tableDataByKeys;
-            keysTable[id][`${prefix+id}`] = value;
-            this.tableData = this.tableData.map(item=>{
-                return keysTable[item.id]
-            });
-            // console.log(this.tableData);
-            this.tableDataByKeys = keysTable;
+            try{
+                keysTable[id][`${prefix+id}`] = value;
+                this.tableData = this.tableData.map(item=>{
+                    return keysTable[item.id]
+                });
+                this.tableDataByKeys = keysTable;
+            }catch (e) {
+                console.log(e);
+            }
+
         },
 
         /**
@@ -342,6 +364,20 @@ export default {
 
         getMoreSetting(data){
             console.log(data);
+        },
+
+        changePage(page){
+            this.pages.currentPage = page;
+            this.init();
+        },
+
+        /**
+         * 搜索设备
+         * @param data
+         */
+        searchEvent(data){
+            //todo
+            console.log(data);
         }
     }
 }
@@ -366,6 +402,7 @@ export default {
         top 8px
     .content-tab
         width 100%
+        min-height 580px
         margin-top 15px
         table
             font-size   12px
@@ -375,10 +412,24 @@ export default {
                 color #fff
                 font-weight normal
                 text-align center
-                padding 10px 0
+                font-size 14px
+                padding 12px 0
             td
                 text-align center
-                padding 8px 0
+                padding 10px 0
+                &:nth-child(1)
+                    width 48px
+                &:nth-child(2)
+                    width 180px
+                &:nth-child(3)
+                    width 200px
+                &:nth-child(4)
+                    width 163px
             .el-input
-                width 80%
+                width 90%
+    .pages
+        text-align center
+        margin-top 20px
+        .el-pager li
+            font-weight 500
 </style>
