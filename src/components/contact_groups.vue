@@ -37,7 +37,7 @@ export default {
         },
         localData:{
             type: Object,
-            default: ()=>null
+            default: ()=>{}
         }
     },
     components:{

@@ -1,12 +1,11 @@
 <template>
     <div class="setting-device-wrap">
-
         <div class="opts">
             <Search type="DEVICES" @searchEvent="searchEvent"/>
             <div class="btnIcons">
                 <el-button-group>
                     <el-tooltip effect="dark" content="增加">
-                        <el-button icon="el-icon-plus"></el-button>
+                        <el-button icon="el-icon-plus" @click="showAddDevicesFlag=true"></el-button>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="删除">
                         <el-button icon="el-icon-minus"></el-button>
@@ -152,16 +151,19 @@
         :localData = "curTdData" 
         @callBack = "getMoreSetting"/>
 
-        <Monitorings />
+        <AddDevices
+            :show.sync = "showAddDevicesFlag"
+            :deviceGroups = "this.deviceGroups"
+            @callBack = "getDeviceInfos"/>
     </div>
 </template>
 
 <script>
-import { getDevices } from '../services/services'
+import { getDevices, getDeviceGroups } from '../services/services'
 import ContactGroups from '../components/contact_groups'
 import MoreSetting from '../components/more_setting'
 import Search from '../components/search'
-import Monitorings from '../components/monitoring_groups'
+import AddDevices from '../components/add_device_component'
 import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox, Pagination } from 'element-ui'
 export default {
     name: 'home',
@@ -180,7 +182,7 @@ export default {
         ContactGroups,
         MoreSetting,
         Search,
-        Monitorings
+        AddDevices
     },
     data(){
         return {
@@ -251,7 +253,9 @@ export default {
             tableDataByKeys:{},          //以id为key，对应表格数据的map，核心数据
             contactGroupsShow: false,    //打开选择联系人弹框
             curTdData: null,
-            showMoreSettingFlag: false     //显示更多设置开关
+            showMoreSettingFlag: false,     //显示更多设置开关
+            showAddDevicesFlag: true,      //添加设备组件开关
+            deviceGroups: []
         }
     },
     mounted() {
@@ -261,7 +265,7 @@ export default {
         /**
          * 获取初始化数据
          */
-        init(){
+        async init(){
             let { pages } = this;
             let params = {
                 page: pages.currentPage,
@@ -272,6 +276,8 @@ export default {
                 this.tableData = res.data;
                 this.tableDataByKeys = this.getPageTableData(res.data);
             })
+
+            this.deviceGroups = await getDeviceGroups().then(res=>res.data);
 
             // this.tableDataByKeys = this.getPageTableData(this.tableData);
         },
@@ -377,6 +383,14 @@ export default {
          */
         searchEvent(data){
             //todo
+            console.log(data);
+        },
+
+        /**
+         * 添加设备组件派发事件返回的数据
+         * @param data {Object}
+         */
+        getDeviceInfos(data){
             console.log(data);
         }
     }

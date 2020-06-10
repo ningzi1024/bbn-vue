@@ -20,3 +20,14 @@ export function getContactGroups(data = {}) {
 export function timePeriods(data= {}) {
     return Api.get(baseUrl+'setting/time_periods', data)
 }
+
+//获取设备模板
+export function getDeviceTemplates(data= {}) {
+    return Api.get(baseUrl+'setting/device_templates', data);
+}
+
+//获取站点数据
+export function getDeviceGroups(data= {}) {
+    return Api.get(baseUrl+'setting/device_groups', data);
+}
+
