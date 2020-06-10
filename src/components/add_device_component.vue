@@ -1,9 +1,9 @@
 <template>
     <el-dialog
         class="add-device-wrap"
+        width="100%"
         title="添加设备"
         :visible="show"
-        width="1260px"
         :close-on-click-modal="false"
         @close="btnCancel">
         <div class="templateCon">
@@ -17,8 +17,8 @@
                 </el-tree>
             </div>
             <div class="opts">
-                <el-button type="primary" icon="el-icon-arrow-right" @click="joinToTable">加入</el-button>
-                <el-button type="warning" icon="el-icon-arrow-left">移除</el-button>
+                <el-button type="primary" icon="el-icon-arrow-right" @click="joinToTable" size="mini">加入</el-button>
+                <el-button type="warning" icon="el-icon-arrow-left" size="mini">移除</el-button>
             </div>
             <div class="new-devices-tab">
                 <el-table
@@ -33,7 +33,7 @@
                             <el-input
                                     size="small"
                                     v-model="scope.row[`model_${scope.row.id}`]"
-                                    @input="((val)=>{inputName(val, scope.row.id, 'model')})">
+                                    @input="((val)=>{inputName(val, scope.row.id, `model_${scope.row.id}`)})">
                             </el-input>
                         </template>
                     </el-table-column>
@@ -52,8 +52,8 @@
                         <template slot-scope="scope">
                             <el-input
                                     size="small"
-                                    v-model="scope.row.ipv4"
-                                    @input="((val)=>{inputName(val, scope.row.id, 'ipv4')})">
+                                    v-model="scope.row[`ipv4_${scope.row.id}`]"
+                                    @input="((val)=>{inputName(val, scope.row.id, `ipv4_${scope.row.id}`)})">
                             </el-input>
                         </template>
                     </el-table-column>
@@ -61,8 +61,8 @@
                         <template slot-scope="scope">
                             <el-input
                                     size="small"
-                                    v-model="scope.row.protocol_id"
-                                    @input="((val)=>{inputName(val, scope.row.id, 'protocol_id')})">
+                                    v-model="scope.row[`protocol_id_${scope.row.id}`]"
+                                    @input="((val)=>{inputName(val, scope.row.id, `protocol_id_${scope.row.id}`)})">
                             </el-input>
                         </template>
                     </el-table-column>
@@ -190,6 +190,7 @@ export  default {
          */
         joinToTable(){
             let arr = this.$refs.myTree.getCheckedNodes().filter(item=>item.id>0);
+            arr  = this.copyKeysByParam(arr, 'id');
             // arr = this.setArrItem(arr, 'count', 1);
             console.log(arr);
             this.tableData = this.tableData.concat(arr);
@@ -205,6 +206,8 @@ export  default {
 <style lang="stylus">
 .add-device-wrap
     font-size 12px
+    width 1260px
+    margin 0 auto
     .el-dialog__header
         background #2fa1f7
         padding 12px 20px 8px
@@ -238,17 +241,21 @@ export  default {
                     left 5px
                 &:nth-child(2)
                     top 52%
-                    right  5px
+                    left -5px
+            .el-button--mini, .el-button--mini.is-round
+                padding 7px 9px        
         .new-devices-tab
-            width 890px
+            width 860px
             height 315px
             display inline-block
+            float right
             border 1px solid #c8c8ca
             overflow-x hidden
             overflow-y auto
             table
                 font-size   12px
                 text-align center
+                width 100%
                 th
                     background-color #54b5ff
                     color #fff

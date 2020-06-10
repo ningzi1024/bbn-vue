@@ -129,6 +129,31 @@ export default {
                 }
             });
             return arr;
-        }
+        },
+
+        copyKeysByParam(arr=[], suffix='id', keys=[]){
+            if(arr.length<=0 || !keyName) return[];
+            let keyMap = {};
+            if(keys && keys.length>0) {
+                keys.map(item=>{
+                    if(!keyMap[item])
+                    keyMap[item] = item;
+                })
+            }
+            arr.map(item=>{
+                if(keys && keys.length>0){
+                    for(let key in item){
+                        if(key== keys[key]){
+                            item[`${key}_${suffix}`] = item[key];
+                        }
+                    }
+                }else{
+                    for(let key in item){
+                        item[`${key}_${suffix}`] = item[key];
+                    }
+                }
+            })
+            return arr;
+        },
     }
 }
