@@ -23,12 +23,15 @@
         </div>
         <div class="content-tab">
             <el-table
-                   :data="tableData"
-                   stripe
-                   style="width: 100%"
-                   border>
+                ref="myTable"
+                :data="tableData"
+                stripe
+                style="width: 100%"
+                :row-class-name="rowIsEditing"
+                border>
                 <el-table-column type="selection"/>
                 <el-table-column
+                        class="editing"
                         width="180"
                        label="设备名称">
                     <template slot-scope="scope">
@@ -45,6 +48,7 @@
                         <el-select
                                 size="small"
                                 v-model="tableDataByKeys[scope.row.id][`device_group_id_${scope.row.id}`]"
+                                @change="(val)=>inputName(val,scope.row.id, 'device_group_id_')"
                                 placeholder="请选择机房">
                             <el-option
                                     v-for="item in scope.row.device_groups"
@@ -165,8 +169,10 @@ import MoreSetting from '../components/more_setting'
 import Search from '../components/search'
 import AddDevices from '../components/add_device_component'
 import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox, Pagination } from 'element-ui'
+import globalMixin from "../mixins/globalMixin";
 export default {
     name: 'home',
+    mixins:[globalMixin],
     components: {
         [Select.name]: Select,
         [Option.name]: Option,
@@ -254,7 +260,7 @@ export default {
             contactGroupsShow: false,    //打开选择联系人弹框
             curTdData: null,
             showMoreSettingFlag: false,     //显示更多设置开关
-            showAddDevicesFlag: true,      //添加设备组件开关
+            showAddDevicesFlag: false,      //添加设备组件开关
             deviceGroups: []
         }
     },
@@ -273,8 +279,10 @@ export default {
             };
             getDevices(params).then(res=>{
                 this.pages.total = res.total;
-                this.tableData = res.data;
-                this.tableDataByKeys = this.getPageTableData(res.data);
+                let list = res.data;
+                list = this.setArrItem(list, 'editing', false); //增加一个编辑状态字段
+                this.tableData = list;
+                this.tableDataByKeys = this.getPageTableData(list);
             })
 
             this.deviceGroups = await getDeviceGroups().then(res=>res.data);
@@ -330,6 +338,7 @@ export default {
             let keysTable = this.tableDataByKeys;
             try{
                 keysTable[id][`${prefix+id}`] = value;
+                keysTable[id]['editing'] = true;
                 this.tableData = this.tableData.map(item=>{
                     return keysTable[item.id]
                 });
@@ -391,8 +400,39 @@ export default {
          * @param data {Object}
          */
         getDeviceInfos(data){
-            console.log(data);
-        }
+            console.log(data, this.tableDataByKeys);
+            let { tableData } = this,
+                { newDataList } = data,
+                obj = {};
+            obj = this.arrayToObjectById(newDataList);
+            newDataList.map(item=>{
+               tableData.unshift(item);
+            });
+            this.tableData = tableData;
+            this.tableDataByKeys = this.getPageTableData(tableData)
+
+            //刚添加进来的数据处于选中状态
+            this.tableData.map((item,index)=>{
+                if(obj[item.id])
+                    setTimeout(()=>{
+                        this.$refs.myTable.toggleRowSelection(this.tableData[index],true);
+                    },30)
+            })
+        },
+
+        /**
+         * 处于编辑状态的row添加格外的样式
+         * @param row
+         * @param rowIndex
+         * @returns {string}
+         */
+        rowIsEditing({row, rowIndex}){
+            console.log(row, rowIndex);
+            if(!!row&&row.editing)
+                return 'editing';
+            else
+                return ''
+        },
     }
 }
 </script>
@@ -441,6 +481,9 @@ export default {
                     width 163px
             .el-input
                 width 90%
+        .editing
+            .el-input__inner
+                color green
     .pages
         text-align center
         margin-top 20px

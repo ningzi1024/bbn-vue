@@ -12,24 +12,24 @@ module.exports={
     devServer:{
         port: 8080,
         proxy: {
-            // '/api/v1': {
-            //     target: 'http://192.168.1.226:8800/api/v1',
-            //     // target: 'http://192.168.1.111:10088/api/v1',
-            //     changeOrigin: true,
-            //     timeout: 3000,
-            //     pathRewrite: {
-            //         '^/api/v1': ''
-            //     }
-            // },
-            //远程开发使用api代理
             '/api/v1': {
-                target: 'http://demo.gd3n.com/com',
+                target: 'http://192.168.1.226:8800/api/v1',
+                // target: 'http://192.168.1.111:10088/api/v1',
                 changeOrigin: true,
                 timeout: 8000,
                 pathRewrite: {
                     '^/api/v1': ''
                 }
             },
+            //远程开发使用api代理
+            // '/api/v1': {
+            //     target: 'http://demo.gd3n.com/com',
+            //     changeOrigin: true,
+            //     timeout: 8000,
+            //     pathRewrite: {
+            //         '^/api/v1': ''
+            //     }
+            // },
             '/static/mapdata': {
                 target: 'http://192.168.1.226:8800/static/mapdata',
                 // target: 'http://192.168.1.111:10088/static/mapdata',

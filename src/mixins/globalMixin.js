@@ -1,3 +1,4 @@
+import moment from 'moment'
 export default {
     name: "globalMixin",
     created(){
@@ -23,14 +24,31 @@ export default {
         },
 
         /**
+         * 数组转对象，可以为id
+         * @param arr
+         * @returns {{}}
+         */
+        arrayToObjectById(arr){
+            if(!arr || arr.length<=0) return {};
+            if(!arr[0].id) throw 'id不存在！';
+            let obj = {};
+            arr.map(item=>{
+                if(!obj[item.id])
+                    obj[item.id] = item;
+            })
+            return obj;
+        },
+
+        /**
          * api一维数组转化成四级树形结构数据
          * @param data type[Array]
          * @returns {[]|null}
          */
         arrayToTree(data){
             if(!data || Object.prototype.toString.call(data)!='[object Array]') return {};
+            let temp = data;
             let obj = {};
-            data.map(item=>{
+            temp.map(item=>{
                 if(!obj[item.subject]){
                     obj[item.subject] = {
                         label:item.subject,
@@ -108,12 +126,13 @@ export default {
          */
         mergeChangeArr(localArr, changeObj){
             if(!localArr || localArr.length<=0 || !changeObj) return localArr;
-            localArr.map(item=>{
+            let temp = localArr;
+            temp.map(item=>{
                if(changeObj[item.id]){
                    item = changeObj[item.id];
                }
             });
-            return localArr;
+            return temp;
         },
 
         /**
@@ -122,38 +141,69 @@ export default {
          * @param value
          */
         setArrItem(arr, key, value=""){
+            let temp = [];
             if(!arr||arr.length<=0 || !key) return ;
             arr.map(item=>{
                 if(!item[key]) {
                     item[key] = value;
                 }
             });
-            return arr;
+            temp = arr;
+            return temp;
         },
 
+        /**
+         * 用于添加多个数据到表格，id可能重复，需要对id进行处理，并保存原来id值
+         * @param arr
+         * @param localKey
+         * @param curKey
+         * @returns {*}
+         */
+        replaceKey(arr, localKey, curKey){
+            if(!arr || arr.length<=0 || !localKey || !curKey) return arr;
+            let temp = arr;
+            temp.map(item=>{
+              item[curKey] = item[localKey];
+              delete item[localKey];
+              if(localKey==='id') {
+                item.id = item[curKey]+'_'+moment().format('X');
+              }
+            })
+            return temp;
+        },
+
+        /**
+         * 拷贝对象里指定的字段，用原字段加_suffix生产新字段，值等于原字段值
+         * @param arr
+         * @param suffix
+         * @param keys
+         * @returns {*[]}
+         */
         copyKeysByParam(arr=[], suffix='id', keys=[]){
-            if(arr.length<=0 || !keyName) return[];
+            if(arr.length<=0 || !suffix) return[];
             let keyMap = {};
+            let temp = arr;
             if(keys && keys.length>0) {
                 keys.map(item=>{
                     if(!keyMap[item])
                     keyMap[item] = item;
                 })
             }
-            arr.map(item=>{
+            temp.map(item=>{
+                let suffix_val = item[suffix];
                 if(keys && keys.length>0){
                     for(let key in item){
                         if(key== keys[key]){
-                            item[`${key}_${suffix}`] = item[key];
+                            item[`${key}_${suffix_val}`] = item[key];
                         }
                     }
                 }else{
                     for(let key in item){
-                        item[`${key}_${suffix}`] = item[key];
+                        item[`${key}_${suffix_val}`] = item[key];
                     }
                 }
             })
-            return arr;
+            return temp;
         },
     }
 }
