@@ -52,6 +52,8 @@ export function deleteDevice(data={}) {
  * @param id
  */
 export function updateDevice(data= {}) {
-    if(!data.id || !/^[0-9]*$/.test(data.id)) throw 'id 不存在或者不是是数字';
-    return Api.put(baseUrl+'setting/devices/'+ data.id, data);
+    const id = data.id;
+    if(!id || !/^[0-9]*$/.test(id)) throw 'id 不存在或者不是是数字';
+    delete data.id;
+    return Api.put(baseUrl+'setting/devices/'+ id, data);
 }

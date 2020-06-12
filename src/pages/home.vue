@@ -402,6 +402,7 @@ export default {
                     item[key] = this.getStringToNumber(item[key]);
                 }
                 temp.push({
+                    "id": item.id,
                     "name": item[`name_${id}`] || item.name,
                     "ip_address": item[`ip_address_${id}`] || item.ip_address,
                     "port": item[`port_${id}`] || item.port,
