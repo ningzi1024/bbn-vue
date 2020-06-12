@@ -6,7 +6,7 @@ const apiConfig = {
     baseURL: '',
     timeout: 10000,
     headers:{
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        'Content-Type': 'application/json;charset=UTF-8'
     },
     transformRequest:[function(data,headers){
         let token = localStorage.getItem('token');
@@ -18,8 +18,6 @@ const apiConfig = {
         if(token)
             headers.Authorization = 'Bearer ' + token;
         return data;
-    }, function(err){
-        return err;
     }],
     transformResponse:[function(response){
         if(typeof response === 'string'){

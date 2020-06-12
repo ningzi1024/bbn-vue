@@ -15,11 +15,41 @@ const ApiMethods = {
     },
     post(url, params){
         return new Promise((resolve, reject)=>{
-            service.post(url, QS.stringify(params)).then(res=>{
-                resolve(res.data)
-            }).catch(err=>{
-                reject(err)
-            })
+            // service.post(url, QS.stringify(params)).then(res=>{
+            //     resolve(res.data)
+            // }).catch(err=>{
+            //     reject(err)
+            // })
+            console.log(service);
+            service({
+                method: 'post',
+                url: url,
+                data: params,
+                headers:{
+                    'Content-Type': 'application/json;charset=UTF-8',
+                }
+            }).then(res=>resolve(res.data)).catch(err=>reject(err));
+        })
+    },
+    delete(url, params, isUrl=true){
+        return new Promise((resolve, reject)=>{
+            //请求参数拼接在url上
+            if(isUrl){
+                service.delete(url,{
+                    params: params
+                }).then(res=>resolve(res.data)).catch(err=>reject(err));
+            }
+            //请求参数放在请求体
+            else{
+                service.delete(url,{
+                    data: params
+                }).then(res=>resolve(res.data)).catch(err=>reject(err));
+            }
+        })
+    },
+    put(url, params){
+        return new Promise((resolve, reject)=>{
+            service.put(url, params).then(res=>resolve(res.data)).catch(err=>reject(err))
         })
     }
 }

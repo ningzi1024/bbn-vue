@@ -8,7 +8,7 @@
                         <el-button icon="el-icon-plus" @click="showAddDevicesFlag=true"></el-button>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="删除">
-                        <el-button icon="el-icon-minus"></el-button>
+                        <el-button icon="el-icon-minus" @click="deleteDevicesById"></el-button>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="保存">
                         <el-badge is-dot class="item">
@@ -28,6 +28,7 @@
                 stripe
                 style="width: 100%"
                 :row-class-name="rowIsEditing"
+                @selection-change="tableChange"
                 border>
                 <el-table-column type="selection"/>
                 <el-table-column
@@ -163,13 +164,14 @@
 </template>
 
 <script>
-import { getDevices, getDeviceGroups } from '../services/services'
+import { getDevices, getDeviceGroups, addDevice, deleteDevice, updateDevice } from '../services/services'
 import ContactGroups from '../components/contact_groups'
 import MoreSetting from '../components/more_setting'
 import Search from '../components/search'
 import AddDevices from '../components/add_device_component'
 import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox, Pagination } from 'element-ui'
 import globalMixin from "../mixins/globalMixin";
+import axios from 'axios'
 export default {
     name: 'home',
     mixins:[globalMixin],
@@ -261,7 +263,8 @@ export default {
             curTdData: null,
             showMoreSettingFlag: false,     //显示更多设置开关
             showAddDevicesFlag: false,      //添加设备组件开关
-            deviceGroups: []
+            deviceGroups: [],
+            tableSelectedData:[]            //表格选中的数据集合
         }
     },
     mounted() {
@@ -325,6 +328,121 @@ export default {
 
         saveHandle(){
             console.log(this.tableDataByKeys);
+            let { tableData, tableDataByKeys } = this;
+            const insertList = this.getSaveList(tableData);
+            insertList.map(item=>{
+                console.log(item);
+                let params = {
+                    "name":"鲁班3号",
+                    "ip_address":"192.168.1.110",
+                    "port": 1985,
+                    "protocol_id": 1,
+                    "protocol_version": "1.0",
+                    "connection_type": 1,
+                    "registration_package": "3",
+                    "retry_count":3,
+                    "check_interval": 10,
+                    "check_time_period_id": 3,
+                    "notifications_time_period_id": 2,
+                    "notifications_interval": 3600,
+                    "passive_enable": true,
+                    "device_enabled": true,
+                    "notifications_enable": true,
+                    "registration_enable": true,
+                    "protocol": "cell",
+                    "driver": "cellDriver",
+                    "timeout":100,
+                    "device_template_id": 1,
+                    "category_id": 2,
+                    "contact_group_ids": [1],
+                    "device_group_ids": [1]
+                };
+                debugger
+                if(item.isNew){
+                    axios({
+                        method:'post',
+                        url:'/api/v1/setting/devices',
+                        data:item,
+                        headers:{
+                            'Content-Type': 'application/json;charset=UTF-8',
+                            'Authorization':'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTE5NzExNTQsImlhdCI6MTU5MTI1MTE1NCwibmJmIjoxNTkxMjUxMTU0LCJzdWIiOiIxIn0.BMS4-keRBPOkTtImsX0MwrAjIzQBc2wgVezeTR1v_6O9rUkF8k8m2y9QiDKZMzKI0jHAhbE5s7MrdomgLL6j2w'
+                        }
+                    }).then(res=>{
+                        if(res.data && res.data.id>0){
+                            this.$message.success(`【${item.name}】保存成功！`);
+                            this.init();
+                        }
+                    }).catch(()=>{
+                        this.$message.error(`【${item.name}】保存失败！`);
+                    })
+                }else{
+                    updateDevice(item).then(res=>{
+                        console.log(res);
+                    })
+                }
+
+
+                // addDevice(item).then(res=>{
+                //     console.log(res);
+                //     this.$message.success(`【${item.name}】保存成功！`);
+                // }).catch(()=>{
+                //     this.$message.error(`【${item.name}】保存失败！`);
+                // })
+            })
+            // addDevice
+        },
+
+        getSaveList(arr){
+            if(!arr || arr.length<=0) return [];
+            let temp = [];
+            arr =  arr.filter(item=>item.editing===true);
+            arr.map(item=>{
+                let id = item.id;
+                for(var key in item){
+                    item[key] = this.getStringToNumber(item[key]);
+                }
+                temp.push({
+                    "name": item[`name_${id}`] || item.name,
+                    "ip_address": item[`ip_address_${id}`] || item.ip_address,
+                    "port": item[`port_${id}`] || item.port,
+                    "protocol_id": item[`protocol_id_${id}`] || item['protocol_id'],
+                    "protocol_version": String(item[`protocol_version_${id}`] || item.protocol_version),
+                    "connection_type": item[`connection_type_${id}`] || item.connection_type,
+                    "registration_package": String(item[`registration_package_${id}`] || item.registration_package),
+                    "retry_count": item[`retry_count_${id}`] || item.retry_count,
+                    "check_interval": item[`check_interval_${id}`] || item.check_interval,
+                    "check_time_period_id": item[`check_time_period_id_${id}`] || item.check_time_period_id,
+                    "notifications_time_period_id": item[`notifications_time_period_id_${id}`] || item.notifications_time_period_id,
+                    "notifications_interval": item[`notifications_interval_${id}`] || item.notifications_interval,
+                    "passive_enable": item[`passive_enable_${id}`]!==undefined?item[`passive_enable_${id}`]:item.passive_enable,
+                    "device_enabled": item[`device_enabled_${id}`]!==undefined?item[`device_enabled_${id}`]:item.device_enabled,
+                    "notifications_enable": item[`notifications_enable_${id}`]!==undefined?item[`notifications_enable_${id}`]:item.notifications_enable,
+                    "registration_enable": item[`registration_enable_${id}`]!==undefined?item[`registration_enable_${id}`]:item.registration_enable,
+                    "protocol": item[`protocol_${id}`] || item.protocol,
+                    "driver": item[`driver_${id}`] || item.driver,
+                    "timeout": item[`timeout_${id}`] || item.timeout,
+                    "device_template_id": item[`device_template_id_${id}`] || item.device_template_id,
+                    "category_id": item[`category_id_${id}`] || item.category_id,
+                    "contact_group_ids": [1],//item[`contact_groups_ids_${id}`] || item.contact_groups_ids,
+                    // "items": [],//item[`items_${id}`] || item.items,
+                    "device_group_ids": [1]//item[`device_groups_ids_${id}`] || item.device_groups_ids
+                });
+            })
+            console.log(temp);
+            return temp
+        },
+
+        /**
+         *  字符串转数字
+         **/
+        getStringToNumber(value){
+            if(value && typeof value==="string" && /^[0-9]*$/.test(value)){
+                return parseInt(value);
+            }else if(typeof value === 'number'){
+                return value;
+            }else{
+                return value;
+            }
         },
 
         /**
@@ -402,22 +520,30 @@ export default {
         getDeviceInfos(data){
             console.log(data, this.tableDataByKeys);
             let { tableData } = this,
-                { newDataList } = data,
+                { newDataList } = data, //新增数据的数据源
                 obj = {};
             obj = this.arrayToObjectById(newDataList);
             newDataList.map(item=>{
-               tableData.unshift(item);
+                if(item.amount>1){
+                    for(let k = item.amount; k>0;k--){
+                        let localItem = Object.assign({},item,{}); //拷贝item的值到新对象中，localItem 与 item 指向不同的内存地址
+                        localItem.id = `${item.id}_${k}`;
+                        localItem.name = `${item.name}_${k}`;
+                        tableData.unshift(localItem);
+                    }
+                }else
+                    tableData.unshift(item);
             });
             this.tableData = tableData;
             this.tableDataByKeys = this.getPageTableData(tableData)
 
             //刚添加进来的数据处于选中状态
-            this.tableData.map((item,index)=>{
-                if(obj[item.id])
-                    setTimeout(()=>{
-                        this.$refs.myTable.toggleRowSelection(this.tableData[index],true);
-                    },30)
-            })
+            // this.tableData.map((item,index)=>{
+            //     if(obj[item.id])
+            //         setTimeout(()=>{
+            //             this.$refs.myTable.toggleRowSelection(this.tableData[index],true);
+            //         },30)
+            // })
         },
 
         /**
@@ -426,13 +552,35 @@ export default {
          * @param rowIndex
          * @returns {string}
          */
-        rowIsEditing({row, rowIndex}){
-            console.log(row, rowIndex);
+        rowIsEditing({row}){
             if(!!row&&row.editing)
                 return 'editing';
             else
                 return ''
         },
+
+        tableChange(val){
+            this.tableSelectedData = val;
+        },
+
+        /**
+         * 设备删除
+         */
+        deleteDevicesById(){
+            this.tableSelectedData.map(item=>{
+                let id = item.id;
+                if(!id && !/^[0-9]*$/.test(id)) return;
+                deleteDevice(id).then(res=>{
+                    console.log(res);
+                    if(res.status === 'OK'){
+                        this.$message.success('删除成功！');
+                        this.init();
+                    }else
+                        this.$message.error('删除失败！')
+
+                }).catch(()=>this.$message.error('删除失败！'))
+            });
+        }
     }
 }
 </script>

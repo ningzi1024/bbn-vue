@@ -10,6 +10,7 @@
             <div class="treeCon">
                 <el-tree
                     :data="treeData"
+                    @check-change="treeChange"
                     show-checkbox
                     node-key="id"
                     ref="myTree"
@@ -135,6 +136,7 @@ export  default {
             tabObj: {},
             tempTabData: [],
             treeData: [],       //左侧树形结构数据
+            treeDataSelected: [], //树形菜单选中的数据
             selectTabData: []   //表格选中的数据
         }
     },
@@ -192,20 +194,22 @@ export  default {
                     device_enabled:item.device_enabled!==undefined ? item.device_enabled : true,
                     notifications_enable: item.notifications_enable!==undefined?item.notifications_enable:true,
                     registration_enable: item.registration_enable!==undefined?item.registration_enable:true,
-                    protocol: item.protocol||'',
+                    protocol: item.driver||'',
                     driver: item.driver,
                     timeout: item.timeout||100,
                     device_template_id: item.type,
                     category_id: item[`category_id_${id}`],
                     contact_groups_ids: [],
                     items:[],
-                    device_groups_ids: [],
+                    device_groups_ids: [item[`device_${id}`]],
                     connection: item.connection!==undefined?item.connection:false,
                     contact_groups:[],
                     "485_address": item[`protocol_id_${id}`] || "",
+                    protocol_id: item[`protocol_id_${id}`] || "",
                     sort: item[`category_${id}`] || "",
                     editing: true,      //编辑状态
-                    device_groups: this.deviceGroups  //机房信息
+                    device_groups: this.deviceGroups,  //机房信息
+                    isNew: true         //是否是新添加的数据
                 });
             });
             if(!flag) return;
@@ -283,21 +287,26 @@ export  default {
          * 选中数据加入到表格中
          */
         joinToTable(){
-            let checkNodes = this.$refs.myTree.getCheckedNodes();
-            let arr = checkNodes.filter(item=>item.id>0);
-            let { tempTabData } = this;
-            arr.map(item=>{
+            // debugger
+            let { tempTabData, treeDataSelected } = this;
+            let checkNodes = treeDataSelected;//this.$refs.myTree.getCheckedNodes();
+            // let arr = checkNodes.filter(item=>item.id>0);
+            console.log(this.treeDataSelected);
+            let arr2 = Object.assign([],checkNodes,[]);
+
+            arr2.map(item=>{
                 if(!item.amount)
                     item.amount = 1;
                 if(!item.device)
                     item.device = 1;
             });
-            arr = this.replaceKey(arr,'id','type');
-            arr  = this.copyKeysByParam(arr, 'id');
-            this.tempTabData = tempTabData.concat(arr);
+            arr2 = this.replaceKey(Object.assign([],arr2,[]),'id','type');
+            arr2  = this.copyKeysByParam(Object.assign([],arr2,[]), 'id');
+            this.tempTabData = tempTabData.concat(Object.assign([],arr2,[]));
             this.tabObj = this.arrayToObjectById(this.tempTabData);
-            this.tableData = this.tableData.concat(arr);
-            this.deviceTemplates();
+            this.tableData = this.tableData.concat(Object.assign([],arr2,[]));
+            // this.$refs.myTree.setCheckedKeys([])
+            // this.deviceTemplates();
         },
         /**
          * 移除表格选中项数据
@@ -354,6 +363,12 @@ export  default {
                 return false;
             }
             return true;
+        },
+
+        treeChange(obj, selected, childrenSelected){
+            let selectedData = this.$refs.myTree.getCheckedNodes();
+            this.treeDataSelected = selectedData.filter(item=>item.id>0);
+            // console.log(this.treeDataSelected);
         }
     }
 }
