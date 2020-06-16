@@ -1,6 +1,10 @@
+import axios from 'axios'
 import Api from './apiMethods'
 const baseUrl = '/api/v1/';
-
+const headers = {
+    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    'Authorization':'Bearer ' + (sessionStorage.getItem('token') || localStorage.getItem('token'))
+};
 //获取设备列表
 export function getDevices(data= {}){
     return Api.get(baseUrl+'setting/devices' ,data)
@@ -8,7 +12,13 @@ export function getDevices(data= {}){
 
 //添加一项设备
 export function addDevice(data = {}) {
-    return Api.post(baseUrl+'setting/devices', data, false)
+    //apiMethods 内post 方法需要优化，暂时用这个
+    return axios({
+        method: 'post',
+        url: baseUrl+'setting/devices',
+        data: data,
+        headers:headers
+    });
 }
 
 //获取联系人组数据
@@ -54,6 +64,11 @@ export function deleteDevice(data={}) {
 export function updateDevice(data= {}) {
     const id = data.id;
     if(!id || !/^[0-9]*$/.test(id)) throw 'id 不存在或者不是是数字';
-    delete data.id;
-    return Api.put(baseUrl+'setting/devices/'+ id, data);
+    // return Api.put(baseUrl+'setting/devices/'+ id, data);
+    return axios({
+        method: 'put',
+        url: baseUrl+'setting/devices/'+id,
+        data: data,
+        headers:headers
+    });
 }

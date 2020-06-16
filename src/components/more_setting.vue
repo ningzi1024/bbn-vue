@@ -68,8 +68,8 @@
                     <td>驱动</td>
                     <td>
                         <el-input
-                            v-model="moreData.protocol"
-                            @input="(val)=>inputName(val, 'protocol')">
+                            v-model="moreData.driver"
+                            @input="(val)=>inputName(val, 'driver')">
                         </el-input>
                         
                     </td>
@@ -134,7 +134,7 @@ export default {
                 check_time_period_id: 0,
                 notifications_time_period_id:0,
                 notifications_interval:3600,
-                protocol:'',
+                driver:'',
                 notifications_enable: true,
                 zigbee_enabled: false,
             },
@@ -148,11 +148,9 @@ export default {
 
     },
     watch: {
-        localData(newVal){
-            console.log(newVal);
-            if(newVal){
+        show(newVal){
+            if(newVal===true){
                 let { localData, moreData } = this;
-                localData = newVal;
                 if(localData){
                     for(let key in moreData){
                         moreData[key] = localData[key];
@@ -195,10 +193,12 @@ export default {
         inputName(val, key){
             if(val){
                 this.moreData[key] = val;
-                console.log(val);
             }
         },
 
+        /**
+         * 获取时间段
+         */
         getTimePeriods(){
             timePeriods().then(res=>{
                 let data = res.data;
@@ -230,7 +230,7 @@ export default {
                 check_time_period_id: 0,
                 notifications_time_period_id:0,
                 notifications_interval:3600,
-                protocol:'',
+                driver:'',
                 notifications_enable: true,
                 zigbee_enabled: false,
             };

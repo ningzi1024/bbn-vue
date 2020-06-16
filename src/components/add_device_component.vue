@@ -18,8 +18,8 @@
                 </el-tree>
             </div>
             <div class="opts">
-                <el-button type="primary" icon="el-icon-arrow-right" @click="joinToTable" >加入</el-button>
-                <el-button type="warning" icon="el-icon-arrow-left" @click="removeTabData">移除</el-button>
+                <el-button type="primary" icon="el-icon-arrow-right" size="mini" @click="joinToTable" >加入</el-button>
+                <el-button type="warning" icon="el-icon-arrow-left"  size="mini" @click="removeTabData">移除</el-button>
             </div>
             <div class="new-devices-tab">
                 <el-table
@@ -199,9 +199,9 @@ export  default {
                     timeout: item.timeout||100,
                     device_template_id: item.type,
                     category_id: item[`category_id_${id}`],
-                    contact_groups_ids: [],
-                    items:[],
-                    device_groups_ids: [item[`device_${id}`]],
+                    contact_group_ids: [],
+                    // items:[],
+                    device_group_ids: [item[`device_${id}`]],
                     connection: item.connection!==undefined?item.connection:false,
                     contact_groups:[],
                     "485_address": item[`protocol_id_${id}`] || "",
@@ -409,10 +409,10 @@ export  default {
                 position absolute
                 &:nth-child(1)
                     top 35%
-                    left 5px
+                    left 15px
                 &:nth-child(2)
                     top 52%
-                    left -5px
+                    left 5px
             .el-button--mini, .el-button--mini.is-round
                 padding 7px 9px        
         .new-devices-tab

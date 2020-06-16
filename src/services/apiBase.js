@@ -6,13 +6,13 @@ const apiConfig = {
     baseURL: '',
     timeout: 10000,
     headers:{
-        'Content-Type': 'application/json;charset=UTF-8'
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
     },
     transformRequest:[function(data,headers){
         let token = localStorage.getItem('token');
         let isDev = process.env.NODE_ENV==dev;
         if(isDev){
-            token = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTE5NzExNTQsImlhdCI6MTU5MTI1MTE1NCwibmJmIjoxNTkxMjUxMTU0LCJzdWIiOiIxIn0.BMS4-keRBPOkTtImsX0MwrAjIzQBc2wgVezeTR1v_6O9rUkF8k8m2y9QiDKZMzKI0jHAhbE5s7MrdomgLL6j2w'
+            token = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTI5MDE2NzYsImlhdCI6MTU5MjE4MTY3NiwibmJmIjoxNTkyMTgxNjc2LCJzdWIiOiIxIn0.dmpliSthD4zrt7injtEnS5yVithI_JqSF60IHDT6PB41gKjntmpwEJepMtRLuLIkj5xdt9dzKqNQYaP89cXe6w'
             headers['x-custom-authtoken'] = 'MjFmNzg2YWFlN2FlZmEzOWEzNDA3MjIwOGI2NWYwNTU=';
         }
         if(token)

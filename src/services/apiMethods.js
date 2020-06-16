@@ -15,20 +15,11 @@ const ApiMethods = {
     },
     post(url, params){
         return new Promise((resolve, reject)=>{
-            // service.post(url, QS.stringify(params)).then(res=>{
-            //     resolve(res.data)
-            // }).catch(err=>{
-            //     reject(err)
-            // })
-            console.log(service);
-            service({
-                method: 'post',
-                url: url,
-                data: params,
-                headers:{
-                    'Content-Type': 'application/json;charset=UTF-8',
-                }
-            }).then(res=>resolve(res.data)).catch(err=>reject(err));
+            service.post(url, QS.stringify(params)).then(res=>{
+                resolve(res.data)
+            }).catch(err=>{
+                reject(err)
+            })
         })
     },
     delete(url, params, isUrl=true){

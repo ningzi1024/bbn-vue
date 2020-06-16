@@ -11,12 +11,12 @@
                         <el-button icon="el-icon-minus" @click="deleteDevicesById"></el-button>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="保存">
-                        <el-badge is-dot class="item">
+                        <el-badge :is-dot="globaEditing" class="item">
                             <el-button class="share-button" icon="el-icon-tickets" @click="saveHandle"></el-button>
                         </el-badge>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="批量编辑">
-                        <el-button icon="el-icon-collection" style="float: right"></el-button>
+                        <el-button icon="el-icon-collection" style="float: right" @click="batchManageHandle"></el-button>
                     </el-tooltip>
                 </el-button-group>
             </div>
@@ -60,14 +60,14 @@
                         </el-select>
                     </template>
                 </el-table-column>
-                <el-table-column label="分类">
-                    <template slot-scope="scope">
-                        <el-input
-                                size="small"
-                                v-model="tableDataByKeys[scope.row.id][`sort_${scope.row.id}`]"
-                                @input="((val)=>{inputName(val, scope.row.id, 'sort_')})">
-                        </el-input>
-                    </template>
+                <el-table-column label="分类" prop="sort">
+<!--                    <template slot-scope="scope">-->
+<!--                        <el-input-->
+<!--                                size="small"-->
+<!--                                v-model="tableDataByKeys[scope.row.id][`sort_${scope.row.id}`]"-->
+<!--                                @input="((val)=>{inputName(val, scope.row.id, 'sort_')})">-->
+<!--                        </el-input>-->
+<!--                    </template>-->
                 </el-table-column>
                 <el-table-column label="IP地址">
                     <template slot-scope="scope">
@@ -156,10 +156,15 @@
         :localData = "curTdData" 
         @callBack = "getMoreSetting"/>
 
+        <!--   添加设备     -->
         <AddDevices
             :show.sync = "showAddDevicesFlag"
             :deviceGroups = "this.deviceGroups"
             @callBack = "getDeviceInfos"/>
+
+        <BatchManage
+                :show.sync = "showBatchManageFlag"
+                :list="batchManageList" @callBack="getBatchMangeData"/>
     </div>
 </template>
 
@@ -169,9 +174,10 @@ import ContactGroups from '../components/contact_groups'
 import MoreSetting from '../components/more_setting'
 import Search from '../components/search'
 import AddDevices from '../components/add_device_component'
+import BatchManage from '../components/batch_manage'
 import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox, Pagination } from 'element-ui'
 import globalMixin from "../mixins/globalMixin";
-import axios from 'axios'
+
 export default {
     name: 'home',
     mixins:[globalMixin],
@@ -190,7 +196,8 @@ export default {
         ContactGroups,
         MoreSetting,
         Search,
-        AddDevices
+        AddDevices,
+        BatchManage
     },
     data(){
         return {
@@ -204,67 +211,17 @@ export default {
                 pageSize: 10,
                 currentPage:1
             },
-            tableData: [
-                {
-                    "id": 24,
-                    "name": "新建主机1",
-                    "device_group": "",
-                    "device_group_id": 0,
-                    "sort": "",
-                    "port": 1985,
-                    "ip_address": "192.168.1.110",
-                    "485_address": 0,
-                    "connection": true,
-                    "registration_package": "3",
-                    "device_groups": [
-                        {
-                            "id": 8,
-                            "name": "广东总部机房"
-                        },
-                        {
-                            "id": 7,
-                            "name": "1513512"
-                        },
-                        {
-                            "id": 6,
-                            "name": "新增项3"
-                        },
-                        {
-                            "id": 3,
-                            "name": "东莞机房"
-                        },
-                        {
-                            "id": 2,
-                            "name": "广东机房"
-                        },
-                        {
-                            "id": 1,
-                            "name": "北京机房"
-                        }
-                    ],
-                    "check_interval": 10,
-                    "retry_count": 3,
-                    "check_time_period": "",
-                    "check_time_period_id": 3,
-                    "notifications_time_period": "",
-                    "notifications_time_period_id": 2,
-                    "notifications_interval": 3600,
-                    "protocol": "cell",
-                    "passive_enable": true,
-                    "notifications_enable": true,
-                    "device_enabled": true,
-                    "zigbee_enabled": false,
-                    "physical_address": "",
-                    "contact_groups": []
-                }
-            ],              //表格数据
+            tableData: [],              //表格数据
             tableDataByKeys:{},          //以id为key，对应表格数据的map，核心数据
             contactGroupsShow: false,    //打开选择联系人弹框
             curTdData: null,
             showMoreSettingFlag: false,     //显示更多设置开关
             showAddDevicesFlag: false,      //添加设备组件开关
+            showBatchManageFlag: false,      //显示批量管理开关
             deviceGroups: [],
-            tableSelectedData:[]            //表格选中的数据集合
+            tableSelectedData:[],            //表格选中的数据集合
+            batchManageList: [],             //批量管理选中数据
+            globaEditing: false              //全局开关，是否存在编辑
         }
     },
     mounted() {
@@ -275,22 +232,29 @@ export default {
          * 获取初始化数据
          */
         async init(){
+            this.getDevicesList();
+            this.deviceGroups = await getDeviceGroups().then(res=>res.data);
+            // this.tableDataByKeys = this.getPageTableData(this.tableData);
+        },
+
+        /**
+         * @params {Object} 传入搜索条件参数
+         *  获取设备的列表
+         * */
+        getDevicesList(params = {}){
             let { pages } = this;
-            let params = {
+            let _params = {
                 page: pages.currentPage,
-                limit: pages.pageSize
+                limit: pages.pageSize,
+                ...params
             };
-            getDevices(params).then(res=>{
+            getDevices(_params).then(res=>{
                 this.pages.total = res.total;
                 let list = res.data;
                 list = this.setArrItem(list, 'editing', false); //增加一个编辑状态字段
                 this.tableData = list;
                 this.tableDataByKeys = this.getPageTableData(list);
-            })
-
-            this.deviceGroups = await getDeviceGroups().then(res=>res.data);
-
-            // this.tableDataByKeys = this.getPageTableData(this.tableData);
+            });
         },
 
         /**
@@ -328,48 +292,15 @@ export default {
 
         saveHandle(){
             console.log(this.tableDataByKeys);
-            let { tableData, tableDataByKeys } = this;
+            let { tableData } = this;
             const insertList = this.getSaveList(tableData);
             insertList.map(item=>{
                 console.log(item);
-                let params = {
-                    "name":"鲁班3号",
-                    "ip_address":"192.168.1.110",
-                    "port": 1985,
-                    "protocol_id": 1,
-                    "protocol_version": "1.0",
-                    "connection_type": 1,
-                    "registration_package": "3",
-                    "retry_count":3,
-                    "check_interval": 10,
-                    "check_time_period_id": 3,
-                    "notifications_time_period_id": 2,
-                    "notifications_interval": 3600,
-                    "passive_enable": true,
-                    "device_enabled": true,
-                    "notifications_enable": true,
-                    "registration_enable": true,
-                    "protocol": "cell",
-                    "driver": "cellDriver",
-                    "timeout":100,
-                    "device_template_id": 1,
-                    "category_id": 2,
-                    "contact_group_ids": [1],
-                    "device_group_ids": [1]
-                };
-                debugger
                 if(item.isNew){
-                    axios({
-                        method:'post',
-                        url:'/api/v1/setting/devices',
-                        data:item,
-                        headers:{
-                            'Content-Type': 'application/json;charset=UTF-8',
-                            'Authorization':'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTE5NzExNTQsImlhdCI6MTU5MTI1MTE1NCwibmJmIjoxNTkxMjUxMTU0LCJzdWIiOiIxIn0.BMS4-keRBPOkTtImsX0MwrAjIzQBc2wgVezeTR1v_6O9rUkF8k8m2y9QiDKZMzKI0jHAhbE5s7MrdomgLL6j2w'
-                        }
-                    }).then(res=>{
-                        if(res.data && res.data.id>0){
+                    addDevice(item).then(res=>{
+                        if(res.data && res.data.id>0) {
                             this.$message.success(`【${item.name}】保存成功！`);
+                            this.globaEditing = false;
                             this.init();
                         }
                     }).catch(()=>{
@@ -377,60 +308,104 @@ export default {
                     })
                 }else{
                     updateDevice(item).then(res=>{
-                        console.log(res);
+                        if(res.data && res.data.status==="OK"){
+                            this.$message.success('更新成功！');
+                            this.globaEditing = false;
+                            setTimeout(()=>{
+                                this.init();
+                            }, 30)
+                        }else
+                            this.$message.error(`【${item.name}】 更新失败！`)
                     })
                 }
-
-
-                // addDevice(item).then(res=>{
-                //     console.log(res);
-                //     this.$message.success(`【${item.name}】保存成功！`);
-                // }).catch(()=>{
-                //     this.$message.error(`【${item.name}】保存失败！`);
-                // })
             })
             // addDevice
         },
 
-        getSaveList(arr){
+        /**
+         * 新增设备生成的数据
+         * @param arr
+         * @return Array
+         */
+        getSaveList(arr) {
             if(!arr || arr.length<=0) return [];
             let temp = [];
             arr =  arr.filter(item=>item.editing===true);
-            arr.map(item=>{
-                let id = item.id;
-                for(var key in item){
-                    item[key] = this.getStringToNumber(item[key]);
-                }
-                temp.push({
-                    "id": item.id,
-                    "name": item[`name_${id}`] || item.name,
-                    "ip_address": item[`ip_address_${id}`] || item.ip_address,
-                    "port": item[`port_${id}`] || item.port,
-                    "protocol_id": item[`protocol_id_${id}`] || item['protocol_id'],
-                    "protocol_version": String(item[`protocol_version_${id}`] || item.protocol_version),
-                    "connection_type": item[`connection_type_${id}`] || item.connection_type,
-                    "registration_package": String(item[`registration_package_${id}`] || item.registration_package),
-                    "retry_count": item[`retry_count_${id}`] || item.retry_count,
-                    "check_interval": item[`check_interval_${id}`] || item.check_interval,
-                    "check_time_period_id": item[`check_time_period_id_${id}`] || item.check_time_period_id,
-                    "notifications_time_period_id": item[`notifications_time_period_id_${id}`] || item.notifications_time_period_id,
-                    "notifications_interval": item[`notifications_interval_${id}`] || item.notifications_interval,
-                    "passive_enable": item[`passive_enable_${id}`]!==undefined?item[`passive_enable_${id}`]:item.passive_enable,
-                    "device_enabled": item[`device_enabled_${id}`]!==undefined?item[`device_enabled_${id}`]:item.device_enabled,
-                    "notifications_enable": item[`notifications_enable_${id}`]!==undefined?item[`notifications_enable_${id}`]:item.notifications_enable,
-                    "registration_enable": item[`registration_enable_${id}`]!==undefined?item[`registration_enable_${id}`]:item.registration_enable,
-                    "protocol": item[`protocol_${id}`] || item.protocol,
-                    "driver": item[`driver_${id}`] || item.driver,
-                    "timeout": item[`timeout_${id}`] || item.timeout,
-                    "device_template_id": item[`device_template_id_${id}`] || item.device_template_id,
-                    "category_id": item[`category_id_${id}`] || item.category_id,
-                    "contact_group_ids": [1],//item[`contact_groups_ids_${id}`] || item.contact_groups_ids,
-                    // "items": [],//item[`items_${id}`] || item.items,
-                    "device_group_ids": [1]//item[`device_groups_ids_${id}`] || item.device_groups_ids
-                });
+            arr.map(item=> {
+                // if(item.isNew){
+                    let id = item.id;
+                    for (var key in item) {
+                        item[key] = this.getStringToNumber(item[key]);
+                    }
+                    let contact_groups_ids = item[`contact_group_ids_${id}`] || item.contact_group_ids,
+                        device_group_ids = (item[`device_group_ids_${id}`] || item.device_group_ids) || [item[`device_group_id_${id}`]];
+                    if(!item.isNew) {
+                        let tempContacts = [];
+                        item[`contact_groups_${item.id}`].map(item=>{
+                            tempContacts.push(item.id);
+                        });
+                        contact_groups_ids =tempContacts;
+                    }
+                    if (!!contact_groups_ids && contact_groups_ids.length <= 0){
+                        this.$message.error('请选择联系人组！');
+                        return false;
+                    }
+                    let _item = {
+                        "id": item.id,
+                        "name": item[`name_${id}`] || item.name,
+                        "ip_address": item[`ip_address_${id}`] || item.ip_address,
+                        "port": item[`port_${id}`] || item.port,
+                        "protocol_id": item[`protocol_id_${id}`] || item['protocol_id'] || item[`485_address_${id}`] ,
+                        "protocol_version": String(item[`protocol_version_${id}`] || item.protocol_version),
+                        "connection_type": item[`connection_type_${id}`] || item.connection_type || "",
+                        "connection": item[`connection_${id}`]!==undefined? item[`connection_${id}`] : item.connection,
+                        "registration_package": String(item[`registration_package_${id}`] || item.registration_package),
+                        "retry_count": item[`retry_count_${id}`] || item.retry_count,
+                        "check_interval": item[`check_interval_${id}`] || item.check_interval,
+                        "check_time_period_id": item[`check_time_period_id_${id}`] || item.check_time_period_id,
+                        "notifications_time_period_id": item[`notifications_time_period_id_${id}`] || item.notifications_time_period_id,
+                        "notifications_interval": item[`notifications_interval_${id}`] || item.notifications_interval,
+                        "passive_enable": (item[`passive_enable_${id}`]!==undefined?item[`passive_enable_${id}`]:item.passive_enable) || item[`connection_${id}`],
+                        "device_enabled": item[`device_enabled_${id}`]!==undefined?item[`device_enabled_${id}`]:item.device_enabled,
+                        "notifications_enable": item[`notifications_enable_${id}`]!==undefined?item[`notifications_enable_${id}`]:item.notifications_enable,
+                        "registration_enable": item[`registration_enable_${id}`]!==undefined?item[`registration_enable_${id}`]:item.registration_enable,
+                        "protocol": item[`protocol_${id}`] || item.protocol,
+                        "driver": item[`driver_${id}`] || item.driver || (item[`protocol_${id}`] || item.protocol),
+                        "timeout": item[`timeout_${id}`] || item.timeout,
+                        "device_template_id": item[`device_template_id_${id}`] || item.device_template_id || "",
+                        "category_id": item[`category_id_${id}`] || item.category_id ,
+                        "contact_group_ids": contact_groups_ids,//item[`contact_groups_ids_${id}`] || item.contact_groups_ids,
+                        "device_group_ids": device_group_ids,//item[`device_groups_ids_${id}`] || item.device_groups_ids
+                        "isNew": item.isNew!==undefined?item.isNew:false,
+                        "sort": item[`sort_${id}`]
+                    };
+                    if(!_item.isNew)
+                        delete _item['category_id'];
+
+                    temp.push(_item);
+
+                // }else {
+                //     item = this.getSameKeyById(item);
+                //     temp.push(item);
+                // }
             })
             console.log(temp);
             return temp
+        },
+
+        getSameKeyById(item){
+            let id = item.id,
+                len = id.length+1;
+            if(!item || !id) return {};
+            for(let key in item) {
+                let val = item[key];
+                if(key.indexOf(`_${id}`)>-1) {
+                    let localKey = key.substring(0, key.length-len);
+                    item[localKey] = val;
+                    delete item[key];
+                }
+            }
+            return item;
         },
 
         /**
@@ -458,6 +433,7 @@ export default {
             try{
                 keysTable[id][`${prefix+id}`] = value;
                 keysTable[id]['editing'] = true;
+                this.globaEditing = true;
                 this.tableData = this.tableData.map(item=>{
                     return keysTable[item.id]
                 });
@@ -473,10 +449,15 @@ export default {
          * @param data type[object]
          */
         getDeviceContact(data) {
-            console.log(data);
             const { id,contactGroups } = data;
+            console.log('contactGroups:',contactGroups);
             if(!id) return;
-            this.inputName(contactGroups,id, 'contact_groups_');
+            let arr = [];
+            contactGroups.map(item=>arr.push(item.id));
+            debugger
+            this.inputName(arr, id, 'contact_group_ids_');
+            this.inputName(contactGroups, id, 'contact_groups_');
+            // console.log(this.tableData);
         },
 
         /**
@@ -496,8 +477,25 @@ export default {
             this.curTdData = row;
         },
 
+        /**
+         *  更多设置回调函数，返回 id和 moreSetting。
+         **/
         getMoreSetting(data){
             console.log(data);
+            let { id, moreSetting } = data;
+            if(!id || !moreSetting) return;
+            this.tableData.map(item=>{
+               if(item.id === id) {
+                   for(let key in moreSetting) {
+                       if(item[key]!==moreSetting[key]) {
+                           item[key] = moreSetting[key];
+                           item.editing = true;
+                           this.globaEditing = true;
+                       }
+
+                   }
+               }
+            });
         },
 
         changePage(page){
@@ -510,8 +508,17 @@ export default {
          * @param data
          */
         searchEvent(data){
-            //todo
             console.log(data);
+            let params = {
+                category:data.type,
+                device_group_id: data.site,
+                ...data
+            };
+            delete params.type;
+            delete params.site;
+            if(!params.category)
+                delete params.category
+            this.getDevicesList(params);
         },
 
         /**
@@ -581,7 +588,30 @@ export default {
 
                 }).catch(()=>this.$message.error('删除失败！'))
             });
-        }
+        },
+
+        /**
+         * 点击批量操作功能
+         * @return {boolean}
+         */
+        batchManageHandle(){
+            let { tableSelectedData } = this;
+            if(tableSelectedData.length<2){
+                this.showBatchManageFlag = false;
+                this.$message.error('至少选择两项进行操作！');
+                return false;
+            }
+            this.batchManageList = this.tableSelectedData;
+            this.showBatchManageFlag = true;
+        },
+
+        /**
+         * 批量操作，返回数据
+         * @param arr
+         */
+        getBatchMangeData(arr){
+            console.log(arr);
+        },
     }
 }
 </script>
