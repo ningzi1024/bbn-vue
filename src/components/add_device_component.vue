@@ -391,7 +391,8 @@ export  default {
                 color #fff
     .templateCon
         width 100%
-        padding 20 10px
+        padding 20px 10px
+        position: relative
         .treeCon
             width 230px
             height 315px
@@ -403,26 +404,29 @@ export  default {
             display inline-block
             width 100px
             height 315px
-            overflow hidden
             position: relative;
             .el-button
                 position absolute
                 &:nth-child(1)
                     top 35%
-                    left 15px
+                    left 50%
+                    margin-left -28px
                 &:nth-child(2)
                     top 52%
-                    left 5px
+                    left 50%
+                    margin-left -28px
             .el-button--mini, .el-button--mini.is-round
                 padding 7px 9px        
         .new-devices-tab
             width 860px
             height 315px
             display inline-block
-            float right
+            /*float right*/
             border 1px solid #c8c8ca
             overflow-x hidden
             overflow-y auto
+            position absolute
+            right 0
             table
                 font-size   12px
                 text-align center

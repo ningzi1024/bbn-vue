@@ -205,5 +205,22 @@ export default {
             })
             return temp;
         },
+
+        /**
+         * 确认框通用
+         * @param title
+         * @param message
+         * @param $_sureEvent 确定事件
+         * @param $_cancelEvent 取消事件
+         */
+        confirmPop({title, message, success, error }){
+            title = title || '温馨提示';
+            message = message || '此操作将永久删除该文件, 是否继续?'
+            this.$confirm(message, title, {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => success()).catch(() => error&&error());
+        }
     }
 }

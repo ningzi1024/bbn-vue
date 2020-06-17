@@ -99,9 +99,9 @@ export  default{
          * 确认操作事件
          */
         btnSure(){
-            let { copyAim, userAim} = this;
-            let arr = userAim;
-            this.$emit('callBack', arr);
+            let { copyAim, userAim, checkedAttrs} = this;
+            const tidyArr = this.copyAimToUserAim(copyAim, userAim, checkedAttrs);
+            this.$emit('callBack', tidyArr);
             this.btnCancel();
         },
 
@@ -125,6 +125,35 @@ export  default{
                 userAim.splice(index,1,copyAim);
                 this.userAim = userAim;
             }
+        },
+
+
+        /**
+         * 将选中的属性，拷贝到应用对象
+         * @param copyObj
+         * @param userObj
+         * @param copyKeys
+         * @return {*[]}
+         */
+        copyAimToUserAim(copyObj={}, userObj=[], copyKeys=[]){
+            if(!copyObj.id || !userObj.length || !copyKeys.length ) return [];
+            const keyMap = {},
+                copyObjId = copyObj.id;
+            copyKeys.map(item=>{
+                if(!keyMap[item]){
+                    keyMap[item] = item;
+                }
+            });
+            userObj.map(item=>{
+                let id = item.id;
+                item.editing = true;
+                for(let key in keyMap) {
+                    let val = copyObj[`${key}_${copyObjId}`] || copyObj[key];
+                    item[key] = val;
+                    item[`${key}_${id}`] = val;
+                }
+            })
+            return userObj;
         }
     }
 }

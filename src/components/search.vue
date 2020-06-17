@@ -159,4 +159,5 @@ export default {
 .search-wrap
     width 70%
     display inline-block
+    background none!important
 </style>

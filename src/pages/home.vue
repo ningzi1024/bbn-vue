@@ -8,11 +8,11 @@
                         <el-button icon="el-icon-plus" @click="showAddDevicesFlag=true"></el-button>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="删除">
-                        <el-button icon="el-icon-minus" @click="deleteDevicesById"></el-button>
+                        <el-button icon="el-icon-minus" @click="deleteDeviceConfirm"></el-button>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="保存">
                         <el-badge :is-dot="globaEditing" class="item">
-                            <el-button class="share-button" icon="el-icon-tickets" @click="saveHandle"></el-button>
+                            <el-button class="share-button" icon="el-icon-tickets" @click="saveCofirm"></el-button>
                         </el-badge>
                     </el-tooltip>
                     <el-tooltip effect="dark" content="批量编辑">
@@ -141,6 +141,7 @@
                 :total="pages.total"
                 :page-size="pages.pageSize"
                 @current-change = "changePage"
+                :current-page = "this.pages.currentPage"
                 class="pages">
         </el-pagination>
 
@@ -177,6 +178,7 @@ import AddDevices from '../components/add_device_component'
 import BatchManage from '../components/batch_manage'
 import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox, Pagination } from 'element-ui'
 import globalMixin from "../mixins/globalMixin";
+import Const from '../utils/const'
 
 export default {
     name: 'home',
@@ -290,10 +292,26 @@ export default {
             return obj;
         },
 
+        /**
+         *  保存数据确认框
+         **/
+        saveCofirm(){
+            if(!this.globaEditing) return;
+            this.confirmPop({
+                title: '保存设备',
+                message: '确定保存或更新设备信息吗？',
+                success:()=>this.saveHandle()
+            })
+        },
+
+        /**
+         *  保存设备，更新设备
+         **/
         saveHandle(){
-            console.log(this.tableDataByKeys);
             let { tableData } = this;
             const insertList = this.getSaveList(tableData);
+            let counter = insertList.length;
+            if(!this.checkFormData(insertList)) return false;
             insertList.map(item=>{
                 console.log(item);
                 if(item.isNew){
@@ -301,25 +319,90 @@ export default {
                         if(res.data && res.data.id>0) {
                             this.$message.success(`【${item.name}】保存成功！`);
                             this.globaEditing = false;
-                            this.init();
+                            counter--;
+                            if(counter<=0)
+                                this.init();
                         }
                     }).catch(()=>{
+                        counter--;
                         this.$message.error(`【${item.name}】保存失败！`);
+                        if(counter<=0)
+                            this.init();
                     })
                 }else{
                     updateDevice(item).then(res=>{
+                        counter--;
                         if(res.data && res.data.status==="OK"){
                             this.$message.success('更新成功！');
                             this.globaEditing = false;
-                            setTimeout(()=>{
+                        }else{
+                            this.$message.error(`【${item.name}】 更新失败！`);
+                        }
+                        setTimeout(()=>{
+                            if(counter<=0)
                                 this.init();
-                            }, 30)
-                        }else
-                            this.$message.error(`【${item.name}】 更新失败！`)
+                        }, 30)
+                    }).catch(()=>{
+                        counter--;
+                        this.$message.error(`【${item.name}】 更新失败！`);
+                        if(counter<=0)
+                            this.init();
                     })
                 }
             })
-            // addDevice
+        },
+
+        /**
+         * 表单数据验证
+         * @param list
+         * @return Boolean
+         */
+        checkFormData(list){
+            if(list && list.length<=0) return false;
+            let flag = true;
+            list.map(item=>{
+                let id = item.id;
+                let name = item[`name_${id}`] || item['name'],
+                    device_group_ids = item[`device_group_ids_${id}`] || item['device_group_ids'],
+                    port = item[`port_${id}`] || item['port'],
+                    protocol_id = item[`protocol_id_${id}`] || item['protocol_id'],
+                    registration_package = item[`registration_package_${id}`] || item['registration_package'];
+                if(!name || name==""){
+                    this.$message.error('设备名不能为空！')
+                    flag = false;
+                    return false;
+                }
+                else if(Const.regExp.CHARACTERS.test(name)){
+                    this.$message.error('设备名不能包含特殊字符！')
+                    flag = false;
+                    return false;
+                }else if(device_group_ids.length<=0){
+                    this.$message.error('请选择站点！');
+                    flag = false;
+                    return false;
+                }else if(!port || port == ""){
+                    this.$message.error('端口号不能为空！');
+                    flag = false;
+                    return false;
+                }else if(!Const.regExp.INTEGER.test(port)){
+                    this.$message.error('端口号必须是数字！');
+                    flag = false;
+                    return false;
+                }else if(!protocol_id || protocol_id == ""){
+                    this.$message.error('协议ID不能为空！');
+                    flag = false;
+                    return false;
+                }else if(!Const.regExp.INTEGER.test(protocol_id)){
+                    this.$message.error('协议ID必须是数字！');
+                    flag = false;
+                    return false;
+                }else if(!registration_package|| registration_package == ""){
+                    this.$message.error('被动连接注册包不能为空！');
+                    flag = false;
+                    return false;
+                }
+            });
+            return flag;
         },
 
         /**
@@ -352,14 +435,14 @@ export default {
                     }
                     let _item = {
                         "id": item.id,
-                        "name": item[`name_${id}`] || item.name,
-                        "ip_address": item[`ip_address_${id}`] || item.ip_address,
-                        "port": item[`port_${id}`] || item.port,
-                        "protocol_id": item[`protocol_id_${id}`] || item['protocol_id'] || item[`485_address_${id}`] ,
-                        "protocol_version": String(item[`protocol_version_${id}`] || item.protocol_version),
-                        "connection_type": item[`connection_type_${id}`] || item.connection_type || "",
+                        "name": this.tidyItemVal(item,'name',id),
+                        "ip_address": this.tidyItemVal(item,'ip_address',id),
+                        "port": this.tidyItemVal(item, 'port', id),
+                        "protocol_id": this.tidyItemVal(item, 'protocol_id', id)||this.tidyItemVal(item,'485_address',id),
+                        "protocol_version": String(this.tidyItemVal(item, 'protocol_version', id)),
+                        "connection_type": this.tidyItemVal(item, 'connection_type', id),
                         "connection": item[`connection_${id}`]!==undefined? item[`connection_${id}`] : item.connection,
-                        "registration_package": String(item[`registration_package_${id}`] || item.registration_package),
+                        "registration_package": String(this.tidyItemVal(item, 'registration_package', id)),
                         "retry_count": item[`retry_count_${id}`] || item.retry_count,
                         "check_interval": item[`check_interval_${id}`] || item.check_interval,
                         "check_time_period_id": item[`check_time_period_id_${id}`] || item.check_time_period_id,
@@ -391,6 +474,18 @@ export default {
             })
             console.log(temp);
             return temp
+        },
+
+        /**
+         *  整理数据
+         **/
+        tidyItemVal(item, key, id){
+            if(!id) return item;
+            let val = item[key];
+            if(item[`${key}_${id}`]!==undefined) {
+                val = item[`${key}_${id}`];
+            }
+            return val;
         },
 
         getSameKeyById(item){
@@ -498,7 +593,24 @@ export default {
             });
         },
 
-        changePage(page){
+        changePage(page) {
+            // if (this.globaEditing) {
+            //     this.confirmPop({
+            //         message: '离开页面将会丢失当前正在编辑的内容，是否继续？',
+            //         success: () => {
+            //             this.init();
+            //             this.pages.currentPage = page;
+            //             this.globaEditing = false;
+            //         },
+            //         error:()=>{
+            //
+            //         }
+            //     })
+            // } else {
+            //     this.pages.currentPage = page;
+            //     this.init();
+            // }
+
             this.pages.currentPage = page;
             this.init();
         },
@@ -572,21 +684,43 @@ export default {
         },
 
         /**
-         * 设备删除
+         *  删除框确认
+         **/
+        deleteDeviceConfirm(){
+            let { tableSelectedData } = this;
+            if(tableSelectedData.length<=0){
+                this.$message.error('请选中要删除的数据！');
+                return false
+            }
+            this.confirmPop({
+                success:()=>this.deleteDevicesById(),
+                error:()=>{}
+            });
+        },
+        /**
+         * 设备删除操作
          */
         deleteDevicesById(){
+            let len = this.tableSelectedData.length;
             this.tableSelectedData.map(item=>{
                 let id = item.id;
                 if(!id && !/^[0-9]*$/.test(id)) return;
                 deleteDevice(id).then(res=>{
                     console.log(res);
+                    len--;
                     if(res.status === 'OK'){
                         this.$message.success('删除成功！');
-                        this.init();
                     }else
                         this.$message.error('删除失败！')
+                    if(len<=0)
+                        this.init();
 
-                }).catch(()=>this.$message.error('删除失败！'))
+                }).catch(()=>{
+                    len--;
+                    this.$message.error('删除失败！')
+                    if(len<=0)
+                        this.init();
+                })
             });
         },
 
@@ -610,8 +744,22 @@ export default {
          * @param arr
          */
         getBatchMangeData(arr){
+            let { tableData } = this;
+            arr.map(item=>{
+                tableData = this.mergeChangeArr(tableData,item);
+            })
+            this.tableData = tableData;
+            this.saveHandle();
             console.log(arr);
         },
+    },
+    beforeDestroy() {
+        this.confirmPop({
+            message: '离开页面将会丢失当前正在编辑的内容，是否继续？',
+            success:()=>{
+                this.$nextTick();
+            }
+        });
     }
 }
 </script>

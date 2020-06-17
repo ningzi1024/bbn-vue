@@ -1,9 +1,10 @@
 import axios from 'axios'
 import Api from './apiMethods'
 const baseUrl = '/api/v1/';
+const token = sessionStorage.getItem('token') || localStorage.getItem('token');
 const headers = {
     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-    'Authorization':'Bearer ' + (sessionStorage.getItem('token') || localStorage.getItem('token'))
+    'Authorization':'Bearer ' + token
 };
 //获取设备列表
 export function getDevices(data= {}){
@@ -69,6 +70,6 @@ export function updateDevice(data= {}) {
         method: 'put',
         url: baseUrl+'setting/devices/'+id,
         data: data,
-        headers:headers
+        headers: headers
     });
 }
