@@ -55,23 +55,27 @@ module.exports={
             }
         }
     },
-    configureWebpack:
-        {
-            plugins: [
-                new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-                new webpack.optimize.LimitChunkCountPlugin({
-                    maxChunks: 5,
-                    minChunkSize: 100
-                }),
-                new CompressionPlugin({
-                    test: /\.js$|\.css/,
-                    algorithm: 'gzip',
-                    threshold: 10240,
-                    minRatio: 0.8,
-                    deleteOriginalAssets: false
-                })
-            ]
-        }
-
+    configureWebpack: {
+        plugins: [
+            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+            new webpack.optimize.LimitChunkCountPlugin({
+                maxChunks: 5,
+                minChunkSize: 100
+            }),
+            new CompressionPlugin({
+                test: /\.js$|\.css/,
+                algorithm: 'gzip',
+                threshold: 10240,
+                minRatio: 0.8,
+                deleteOriginalAssets: false
+            })
+        ],
+        externals:{
+            'vue': 'Vue',
+            'vue-router': 'VueRouter',
+            'axios': 'axios',
+            'moment': 'moment'
+        },
+    }
 
 }

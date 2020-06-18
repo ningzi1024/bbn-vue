@@ -1,7 +1,7 @@
 <template>
-    <div class="monitorings-wrap">
+    <div class="monitoring-wrap">
         <el-dialog
-                :title="`更多设置 【${localData && localData.name}】`"
+                :title="`【${localData && localData.name || ''}】- 监控项`"
                 :visible="show"
                 width="1440px"
                 :close-on-click-modal="false"
@@ -25,22 +25,26 @@
                 </div>
             </div>
             <div slot="footer" class="dialog-footer">
-                <el-button @click.stop="btnCancel">关 闭</el-button>
+                <el-button @click.stop="btnCancel" type="primary" size="medium">关 闭</el-button>
             </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import Search from './search'
+import Search from './items_search'
 import { Dialog, Button, Checkbox, Input } from 'element-ui'
 export default {
     name: 'monitoring_groups',
     props:{
+        show: {
+            type: Boolean,
+            default: false
+        },
         //设备id
-        id:{
-            type: Number,
-            default: 0
+        localData:{
+            type: Object,
+            default: ()=>{}
         }
     },
     components:{
@@ -50,9 +54,16 @@ export default {
         [Input.name]: Input,
         Search
     },
+    watch:{
+        show(newVal){
+            if(newVal===true){
+                this.id = this.localData && this.localData.id
+            }
+        }
+    },
     data(){
         return {
-
+            id: 0
         }
     },
     methods: {
@@ -67,6 +78,16 @@ export default {
 </script>
 
 <style lang="stylus">
-.monitorings-wrap
+.monitoring-wrap
     font-size 12px
+    .el-dialog__header
+        background #2fa1f7
+        padding 12px 20px 8px
+        .el-dialog__title
+            color #fff
+            font-size 15px
+        .el-dialog__headerbtn
+            top 12px
+            .el-dialog__close
+                color #fff
 </style>

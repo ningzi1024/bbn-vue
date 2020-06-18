@@ -73,3 +73,22 @@ export function updateDevice(data= {}) {
         headers: headers
     });
 }
+
+/**
+ * 根据ID获取监控项
+ * @param data
+ * @return {Promise | Promise<unknown>}
+ */
+export function getItemsById(id="") {
+    if(!id || !/^[0-9]*$/.test(id)) throw 'id 不存在或者不是是数字';
+    return Api.get(baseUrl+'setting/items/'+id);
+}
+
+/**
+ * 获取所以监控项
+ * @param data
+ * @return {Promise | Promise<unknown>}
+ */
+export function getItems(data= {}) {
+    return Api.get(baseUrl+'setting/items', data);
+}

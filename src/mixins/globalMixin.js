@@ -221,6 +221,26 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => success()).catch(() => error&&error());
-        }
+        },
+
+        /**
+         * 将key_id 结尾的字段值付给key，例如： {name: 'aa', name_23: 'bb'} => {name: 'bb'}
+         * @param item {Object}
+         * @return {{}|*}
+         */
+        getSameKeyById(item){
+            let id = item.id,
+                len = id.length+1;
+            if(!item || !id) return {};
+            for(let key in item) {
+                let val = item[key];
+                if(key.indexOf(`_${id}`)>-1) {
+                    let localKey = key.substring(0, key.length-len);
+                    item[localKey] = val;
+                    delete item[key];
+                }
+            }
+            return item;
+        },
     }
 }

@@ -65,7 +65,7 @@ export  default{
             userAim: [],    //应用对象
             fieldMap:{
                 "device_group_id": "站点",
-                "device_groups": "联系人组",
+                "contact_groups": "联系人组",
                 "ip_address": "IP地址",
                 "port": "端口",
                 "485_address": "协议ID"
