@@ -365,7 +365,7 @@ export  default {
             return true;
         },
 
-        treeChange(obj, selected, childrenSelected){
+        treeChange(){
             let selectedData = this.$refs.myTree.getCheckedNodes();
             this.treeDataSelected = selectedData.filter(item=>item.id>0);
             // console.log(this.treeDataSelected);

@@ -13,3 +13,12 @@ export const STATUS_ID = {
     8: '未知',
     16: '严重'
 };
+
+/**
+ * 告警阈值类型map
+ * @type {{"0": string, "1": string}}
+ */
+export const THRESHOLD_TYPE = {
+  0: '状态',
+  1: '数值'
+};

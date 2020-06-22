@@ -158,6 +158,7 @@ export default {
          * @param localKey
          * @param curKey
          * @returns {*}
+         * 示例 [{id:1}] => [{id: 1_2020154541}]
          */
         replaceKey(arr, localKey, curKey){
             if(!arr || arr.length<=0 || !localKey || !curKey) return arr;
@@ -176,13 +177,14 @@ export default {
          * 拷贝对象里指定的字段，用原字段加_suffix生产新字段，值等于原字段值
          * @param arr
          * @param suffix
-         * @param keys
+         * @param keys 为空时，所有字段添加
          * @returns {*[]}
+         * 使用 copyKeysByParam([{id:22,name:'张三',age:15}], ['name']) => [{id:22,name:'张三', name_22: '张三', age:15}]
          */
         copyKeysByParam(arr=[], suffix='id', keys=[]){
             if(arr.length<=0 || !suffix) return[];
             let keyMap = {};
-            let temp = arr;
+            let temp = arr.slice();
             if(keys && keys.length>0) {
                 keys.map(item=>{
                     if(!keyMap[item])
@@ -193,13 +195,15 @@ export default {
                 let suffix_val = item[suffix];
                 if(keys && keys.length>0){
                     for(let key in item){
-                        if(key== keys[key]){
-                            item[`${key}_${suffix_val}`] = item[key];
+                        if(key== keyMap[key]){
+                            if(!item[`${key}_${suffix_val}`])
+                                item[`${key}_${suffix_val}`] = item[key];
                         }
                     }
                 }else{
                     for(let key in item){
-                        item[`${key}_${suffix_val}`] = item[key];
+                        if(!item[`${key}_${suffix_val}`])
+                            item[`${key}_${suffix_val}`] = item[key];
                     }
                 }
             })

@@ -64,7 +64,7 @@
                         </el-input>
                     </td>
                 </tr>
-                <tr>
+                <tr  v-if="model==='devices'">
                     <td>驱动</td>
                     <td>
                         <el-input
@@ -80,7 +80,7 @@
                         <el-checkbox v-model="moreData.notifications_enable"/>
                     </td>
                 </tr>
-                <tr>
+                <tr v-if="model==='devices'">
                     <td>启用 zigbee</td>
                     <td>
                         <el-checkbox v-model="moreData.zigbee_enabled"/>
@@ -116,6 +116,10 @@ export default {
         localData:{
             type: Object,
             default: ()=>{}
+        },
+        model: {
+            type: String,
+            default: 'devices'  //items: 监控项更多设置， devices: 设备项更多设置
         }
     },
     components:{

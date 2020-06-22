@@ -32,7 +32,6 @@
                 border>
                 <el-table-column type="selection"/>
                 <el-table-column
-                        class="editing"
                         width="180"
                        label="设备名称">
                     <template slot-scope="scope">
@@ -69,7 +68,7 @@
 <!--                        </el-input>-->
 <!--                    </template>-->
                 </el-table-column>
-                <el-table-column label="IP地址">
+                <el-table-column label="IP地址" width="150">
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
@@ -153,9 +152,9 @@
 
         <!--        更多设置组件-->
         <MoreSetting 
-        :show.sync = "showMoreSettingFlag" 
-        :localData = "curTdData" 
-        @callBack = "getMoreSetting"/>
+            :show.sync = "showMoreSettingFlag"
+            :localData = "curTdData"
+            @callBack = "getMoreSetting"/>
 
         <!--   添加设备     -->
         <AddDevices
@@ -163,6 +162,7 @@
             :deviceGroups = "this.deviceGroups"
             @callBack = "getDeviceInfos"/>
 
+        <!--        批量操作-->
         <BatchManage
                 :show.sync = "showBatchManageFlag"
                 :list="batchManageList" @callBack="getBatchMangeData"/>
@@ -224,7 +224,7 @@ export default {
             showMoreSettingFlag: false,     //显示更多设置开关
             showAddDevicesFlag: false,      //添加设备组件开关
             showBatchManageFlag: false,      //显示批量管理开关
-            showMonitoringFlag: true,       //监控项显示开关
+            showMonitoringFlag: false,       //监控项显示开关
             deviceGroups: [],
             tableSelectedData:[],            //表格选中的数据集合
             batchManageList: [],             //批量管理选中数据
@@ -582,7 +582,7 @@ export default {
 
         changePage(page) {
             this.pages.currentPage = page;
-            this.init();
+            this.getDevicesList();
         },
 
         /**
@@ -590,7 +590,6 @@ export default {
          * @param data
          */
         searchEvent(data){
-            console.log(data);
             let params = {
                 category:data.type,
                 device_group_id: data.site,
@@ -598,8 +597,9 @@ export default {
             };
             delete params.type;
             delete params.site;
-            if(!params.category)
-                delete params.category
+            if(params.category===undefined)
+                delete params.category;
+            console.log(params);
             this.getDevicesList(params);
         },
 

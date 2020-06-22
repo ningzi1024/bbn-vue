@@ -1,6 +1,6 @@
 <template>
     <div class="search-wrap">
-        <el-select v-model="searchParams.site" placeholder="请选择站点" @change="$_siteChange">
+        <el-select v-model="searchParams.site" placeholder="请选择站点" @change="$_siteChange" v-if="model==='all'">
             <el-option
                     v-for="item in sites"
                     :key="item.name"
@@ -8,7 +8,7 @@
                     :value="item.id">
             </el-option>
         </el-select>
-        <el-select v-model="searchParams.device" placeholder="请选择设备" class="selectCon" @change="$_deviceChange">
+        <el-select v-model="searchParams.device" placeholder="请选择设备" class="selectCon" @change="$_deviceChange"  v-if="model==='all'">
             <el-option
                     v-for="item in devices"
                     :key="item.name"
@@ -42,6 +42,16 @@ import { Select, Option, Input, Button } from 'element-ui'
 import { getDeviceGroups, getDevices } from '../services/services'
 export default {
     name:'search',
+    props:{
+        model:{
+            type: String,
+            default: 'single' //single：单个设备的监控项 , all：所有监控项目
+        },
+        searchEvent:{
+            type: Function,
+            defalut: ()=>{}
+        }
+    },
     components:{
         [Select.name]: Select,
         [Option.name]: Option,
@@ -52,7 +62,7 @@ export default {
         return {
             searchParams: {
                 site: '',
-                devices: '',
+                device: '',
                 type: '',
                 keywords: '',
                 search: false
@@ -71,22 +81,17 @@ export default {
             this.getDeviceList();
             this.types = [
                 {
-                    name:'设备名称',
+                    name:'监控项名称',
                     id: 0
                 },
                 {
-                    name:'设备IP',
+                    name:'监控项ID',
                     id: 1
-                },
-                {
-                    name:'设备驱动',
-                    id: 2
                 }
             ];
             this.keywordMap = {
                 '0': 'name',
-                '1': 'ip_address',
-                '2': 'driver'
+                '1': 'id'
             };
 
         },
@@ -102,10 +107,15 @@ export default {
                     this.searchParams[this.keywordMap[searchParams.type]] = this.searchParams.keywords;
                 let params = Object.assign({},this.searchParams,{});
                 delete params.keywords;
+                if(this.model==='single'){
+                    delete params.device;
+                    delete params.site
+                }
                 this.$emit('searchEvent', params);
                 this.searchParams = {
                     site: this.searchParams.site,
                     type: this.searchParams.type,
+                    device: this.searchParams.device,
                     keywords: this.searchParams.keywords,
                     search: this.searchParams.search
                 };

@@ -90,7 +90,7 @@ export default {
         getContactGroups(){
             getContactGroups().then(res=>{
                 let localDataObj = {},
-                    contact_groups = this.localData[`contact_groups_${this.localData.id}`];
+                    contact_groups = this.localData[`contact_groups_${this.localData.id}`] || this.localData.contact_groups;
                 contact_groups && contact_groups.map(item=>{
                     if(!localDataObj[item.id])
                         localDataObj[item.id] = item;

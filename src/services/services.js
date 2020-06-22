@@ -92,3 +92,12 @@ export function getItemsById(id="") {
 export function getItems(data= {}) {
     return Api.get(baseUrl+'setting/items', data);
 }
+
+/**
+ * 高级级别列表
+ * @param data
+ * @return {Promise | Promise<unknown>}
+ */
+export function alarmLevels(data={}) {
+    return Api.get(baseUrl+'setting/alarm_levels', data);
+}
