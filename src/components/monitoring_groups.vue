@@ -15,8 +15,8 @@
                             <el-button icon="el-icon-minus"></el-button>
                         </el-tooltip>
                         <el-tooltip effect="dark" content="保存">
-                            <el-badge is-dot class="item">
-                                <el-button class="share-button" icon="el-icon-tickets" @click="saveHandle"></el-button>
+                            <el-badge :is-dot="globalEditing" class="item">
+                                <el-button class="share-button" icon="el-icon-tickets" @click="saveCofirm"></el-button>
                             </el-badge>
                         </el-tooltip>
                         <el-tooltip effect="dark" content="批量编辑">
@@ -159,7 +159,7 @@ export default {
                 pageSize: 6,
                 currentPage:1
             },
-            globalEditing: false,       //全局编辑中
+            globalEditing: true,       //全局编辑中
             showContactGroups: false,   //选择联系人开关
             showMoreSettingFlag: false, //更多设置开关
             showWarnSettingFlag: false
@@ -252,6 +252,7 @@ export default {
          * @param data
          */
         getItemsContact(data){
+            debugger
             const { id,contactGroups } = data;
             let { tableData } = this;
             if(id===undefined || contactGroups===undefined || contactGroups.length<=0) return;
@@ -261,8 +262,9 @@ export default {
                     item.editing = true;
                 }
             })
-            this.tableData = tableData;
-            this.tableObj = this.arrayToObjectById(tableData);
+            this.resetData(tableData);
+            // this.tableData = tableData;
+            // this.tableObj = this.arrayToObjectById(tableData);
         },
         /**
          * 处于编辑状态的row添加格外的样式
@@ -304,8 +306,9 @@ export default {
                     }
                 }
             });
-            this.tableData = tableData;
-            this.tableObj = this.arrayToObjectById(tableData);
+            this.resetData(tableData);
+            // this.tableData = tableData;
+            // this.tableObj = this.arrayToObjectById(tableData);
         },
 
         /**
@@ -331,6 +334,33 @@ export default {
                 });
                 this.tableObj = keysTable;
             }
+        },
+        /**
+         * 刷新数组，model数据
+         * @param arr
+         */
+        resetData(arr){
+            if( arr===undefined || Object.prototype.toString.call(arr) !== "[object Array]") return ;
+            this.tableData = arr;
+            let temp = this.copyKeysByParam(arr.slice(), 'id', ['name']);
+            this.tableObj = this.arrayToObjectById(temp);
+        },
+
+        /**
+         *  保存数据确认框
+         **/
+        saveCofirm(){
+            debugger
+            if(!this.globalEditing) return;
+            this.confirmPop({
+                title: '保存监控项',
+                message: '确定保存或更新监控项信息吗？',
+                success:()=>this.saveHandle()
+            })
+        },
+        
+        saveHandle(){
+
         }
     }
 }
