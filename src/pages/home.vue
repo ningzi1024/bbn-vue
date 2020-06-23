@@ -106,7 +106,7 @@
                 </el-table-column>
                 <el-table-column label="被动链接">
                     <template slot-scope="scope">
-                        <el-checkbox v-model="tableDataByKeys[scope.row.id][`connection_${scope.row.id}`]" @change="((val)=>{inputName(val, scope.row.id, 'connection_')})"></el-checkbox>
+                        <el-checkbox v-model="tableDataByKeys[scope.row.id][`passive_enable_${scope.row.id}`]" @change="((val)=>{inputName(val, scope.row.id, 'passive_enable_')})"></el-checkbox>
                     </template>
                 </el-table-column>
                 <el-table-column label="联系人组">
@@ -287,7 +287,7 @@ export default {
                     obj[item.id][`port_${item.id}`] = item.port;  //端口号 model
                     obj[item.id][`485_address_${item.id}`] = item['485_address'];  //协议id model
                     obj[item.id][`sort_${item.id}`] = item['sort'];  //协议id model
-                    obj[item.id][`connection_${item.id}`] = item['connection']; //被动链接
+                    obj[item.id][`passive_enable_${item.id}`] = item['passive_enable']; //被动链接
                     obj[item.id][`registration_package_${item.id}`] = item['registration_package']; //注册包 model
                     obj[item.id][`device_group_id_${item.id}`] = item.device_group_id>0?item.device_group_id:"";  //设备名称model
                     obj[item.id][`contact_groups_${item.id}`] = item.contact_groups.length>0?item.contact_groups:[];  //联系人组 model
@@ -454,7 +454,7 @@ export default {
                     "check_time_period_id": item[`check_time_period_id_${id}`] || item.check_time_period_id,
                     "notifications_time_period_id": item[`notifications_time_period_id_${id}`] || item.notifications_time_period_id,
                     "notifications_interval": item[`notifications_interval_${id}`] || item.notifications_interval,
-                    "passive_enable": (item[`passive_enable_${id}`]!==undefined?item[`passive_enable_${id}`]:item.passive_enable) || item[`connection_${id}`],
+                    "passive_enable": (item[`passive_enable_${id}`]!==undefined?item[`passive_enable_${id}`]:item.passive_enable) || false,
                     "device_enabled": item[`device_enabled_${id}`]!==undefined?item[`device_enabled_${id}`]:item.device_enabled,
                     "notifications_enable": item[`notifications_enable_${id}`]!==undefined?item[`notifications_enable_${id}`]:item.notifications_enable,
                     "registration_enable": item[`registration_enable_${id}`]!==undefined?item[`registration_enable_${id}`]:item.registration_enable,
