@@ -37,7 +37,6 @@
                             <span>最大值</span>
                             <el-input
                                 size="small"
-                                @blur="(event)=>checkVal(event, tableObj[scope.row.id][`min_${scope.row.id}`],'max')"
                                 v-model="tableObj[scope.row.id][`max_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, 'max_')})">
                             </el-input>
@@ -47,7 +46,6 @@
                             <el-input
                                 size="small"
                                 v-model="tableObj[scope.row.id][`min_${scope.row.id}`]"
-                                @blur="(event)=>checkVal(event,tableObj[scope.row.id][`max_${scope.row.id}`],'min')"
                                 @input="((val)=>{inputName(val, scope.row.id, 'min_')})">
                             </el-input>
                         </div>
@@ -114,6 +112,7 @@ export default {
 
                 }else
                     this.getSingleItem();
+                this.getAlarmLevels();
             }
         }
     },
@@ -125,9 +124,6 @@ export default {
         [Input.name]:Input,
         [Table.name]:Table,
         [TableColumn.name]:TableColumn
-    },
-    mounted() {
-        this.getAlarmLevels();
     },
     methods:{
         /**
@@ -142,14 +138,46 @@ export default {
         btnSure(){
             let { tableData } = this;
             tableData.map(item=>{
-                this.getSameKeyById(item);
+                return this.getSameKeyById(item);
             });
+            if(!this.formChecked(tableData)) return false;
             let params = {
                 id: this.localData.id,
                 list: tableData
             };
             this.$emit('callBack', params);
             this.btnCancel();
+        },
+
+        /**
+         * @param tableData {Array}
+         *@return {Boolean}
+         **/
+        formChecked(tableData){
+            let flag = true;
+            tableData.map(item=>{
+               if(!item.max){
+                   this.$message.error('最大值不能为空！');
+                   flag = false;
+                   return false;
+               }
+               if(!item.min){
+                   this.$message.error('最小值不能为空！');
+                   flag = false;
+                   return false;
+               }
+               if(item.min>=item.max){
+                   flag = false;
+                   this.$message.error('数据不规范 最大值不能小于最小值！');
+                   return false;
+               }
+               if(!item.alarm_level_id){
+                   flag = false;
+                   this.$message.error('请选择告警等级！');
+                   return false;
+               }
+            });
+            return flag;
         },
         /**
          * 获取当前监控项目的警告阈值
@@ -193,6 +221,7 @@ export default {
         inputName(value,id, prefix){
             prefix = prefix || 'name_';
             let keysTable = this.tableObj;
+            let tableData = this.tableData;
             try{
                 if(prefix==='alarm_level_'){
                     let data = {};
@@ -206,10 +235,10 @@ export default {
                 }
                 else
                     keysTable[id][`${prefix+id}`] = value;
-                this.tableData = this.tableData.map(item=>{
+                tableData = tableData.map(item=>{
                     return keysTable[item.id]
                 });
-                this.tableObj = keysTable;
+                this.resetData(tableData);
             }catch (e) {
                 console.log(e);
             }
@@ -231,7 +260,7 @@ export default {
          *  增加操作
          * */
         addHandle(){
-            let tableData = this.tableData.slice();
+            let tableData = [...this.tableData];
             let newData = {
                 alarm_level:{},
                 alarm_level_id: "",
@@ -255,33 +284,10 @@ export default {
         resetData(arr){
             if( arr===undefined || Object.prototype.toString.call(arr) !== "[object Array]") return ;
             this.tableData = arr;
-            let temp = this.copyKeysByParam(arr.slice(), 'id', ['max', 'min', 'alarm_level']);
+            let temp = this.copyKeysByParam([...arr], 'id', ['max', 'min', 'alarm_level']);
             this.tableObj = this.arrayToObjectById(temp);
+            console.log('hahaha',this.tableData);
         },
-
-        /**
-         * 数值填写提示
-         * @param event
-         * @param otherVal
-         * @param type
-         */
-        checkVal(event, otherVal, type){
-            type = type || 'min';
-            let val = event.target.value;
-            let min = 0, max = 0;
-            if(type==='min'){
-                min = val;
-                max = otherVal;
-            }else if(type === 'max'){
-               min = otherVal;
-               max = val;
-            }
-            if(min>=max){
-                this.$message.error('数据不规范 最大值不能小于最小值！');
-
-            }
-        }
-
     }
 }
 </script>

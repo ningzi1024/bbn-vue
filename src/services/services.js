@@ -6,6 +6,7 @@ const headers = {
     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
     'Authorization':'Bearer ' + token
 };
+const regNum = /^[0-9]*$/;
 //获取设备列表
 export function getDevices(data= {}){
     return Api.get(baseUrl+'setting/devices' ,data)
@@ -64,7 +65,7 @@ export function deleteDevice(data={}) {
  */
 export function updateDevice(data= {}) {
     const id = data.id;
-    if(!id || !/^[0-9]*$/.test(id)) throw 'id 不存在或者不是是数字';
+    if(!id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
     // return Api.put(baseUrl+'setting/devices/'+ id, data);
     return axios({
         method: 'put',
@@ -80,7 +81,7 @@ export function updateDevice(data= {}) {
  * @return {Promise | Promise<unknown>}
  */
 export function getItemsById(id="") {
-    if(!id || !/^[0-9]*$/.test(id)) throw 'id 不存在或者不是是数字';
+    if(!id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
     return Api.get(baseUrl+'setting/items/'+id);
 }
 
@@ -100,4 +101,27 @@ export function getItems(data= {}) {
  */
 export function alarmLevels(data={}) {
     return Api.get(baseUrl+'setting/alarm_levels', data);
+}
+
+/**
+ * 更新某个监控项
+ * @param data
+ * @return {AxiosPromise}
+ */
+export function updateItem(data = {}) {
+    const id = data.id;
+    if(!data || !id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
+    let params = {...data};
+    delete params.id;
+    return axios({
+        method: 'put',
+        url: baseUrl+'setting/items/'+id,
+        data: params,
+        headers: headers
+    });
+}
+
+export function deleteItemById(id) {
+    if(!id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
+    return Api.deleteById(baseUrl+'setting/items/', id);
 }

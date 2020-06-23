@@ -43,6 +43,10 @@ import {Button, Dialog, CheckboxGroup, Checkbox} from "element-ui";
 export  default{
     name: 'batchManage',
     props:{
+        model:{
+            type: String,
+            default: 'device' //single：单个设备的监控项 , all：所有监控项目
+        },
         show: {
             type: Boolean,
             default: false
@@ -77,9 +81,17 @@ export  default{
             if(newVal===true){
                 if(this.list && this.list.length>0){
                     this.copyAim = this.list[0];
-                    let temp = Object.assign([],this.list,[]);
+                    let temp = [...this.list];//Object.assign([],this.list,[]);
                     temp.shift();
                     this.userAim = temp;
+                    if(this.model==='items'){
+                        this.fieldMap = {//检查间隔，重试间隔，通知间隔，启用间隔
+                            "contact_groups": "联系人组",
+                            "check_interval":"检查间隔",
+                            "retry_count":"重试次数",
+                            "notification_interval":"通知间隔"
+                        };
+                    }
                 }
             }
         }

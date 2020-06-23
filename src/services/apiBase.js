@@ -12,7 +12,7 @@ const apiConfig = {
         let token = localStorage.getItem('token');
         let isDev = process.env.NODE_ENV==dev;
         if(isDev){
-            token = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTI5MDE2NzYsImlhdCI6MTU5MjE4MTY3NiwibmJmIjoxNTkyMTgxNjc2LCJzdWIiOiIxIn0.dmpliSthD4zrt7injtEnS5yVithI_JqSF60IHDT6PB41gKjntmpwEJepMtRLuLIkj5xdt9dzKqNQYaP89cXe6w'
+            // token = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTI5MDE2NzYsImlhdCI6MTU5MjE4MTY3NiwibmJmIjoxNTkyMTgxNjc2LCJzdWIiOiIxIn0.dmpliSthD4zrt7injtEnS5yVithI_JqSF60IHDT6PB41gKjntmpwEJepMtRLuLIkj5xdt9dzKqNQYaP89cXe6w'
             headers['x-custom-authtoken'] = 'MjFmNzg2YWFlN2FlZmEzOWEzNDA3MjIwOGI2NWYwNTU=';
         }
         if(token)

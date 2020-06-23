@@ -11,7 +11,7 @@
                 <Search type="MONITORINGS" @searchEvent="searchEvent"/>
                 <div class="btnIcons">
                     <el-button-group>
-                        <el-tooltip effect="dark" content="删除">
+                        <el-tooltip effect="dark" content="删除" @click="deleteItemsConfirm">
                             <el-button icon="el-icon-minus"></el-button>
                         </el-tooltip>
                         <el-tooltip effect="dark" content="保存">
@@ -20,7 +20,7 @@
                             </el-badge>
                         </el-tooltip>
                         <el-tooltip effect="dark" content="批量编辑">
-                            <el-button icon="el-icon-collection" style="float: right"></el-button>
+                            <el-button icon="el-icon-collection" style="float: right" @click="batchManageHandle"></el-button>
                         </el-tooltip>
                     </el-button-group>
                 </div>
@@ -101,6 +101,11 @@
                 :localData = "curTdData"
                 @callBack = "getWarnSetting"/>
 
+        <!--        批量操作-->
+        <BatchManage
+                :show.sync = "showBatchManageFlag"
+                model = "items"
+                :list="batchManageList" @callBack="getBatchMangeData"/>
 
     </div>
 </template>
@@ -110,9 +115,11 @@ import Search from './items_search'
 import ContactGroups from './contact_groups'
 import MoreSetting from './more_setting'
 import WarnSetting from './warn_setting'
-import { Dialog, Button, Checkbox, Input, TableColumn, Table, Pagination} from 'element-ui'
-import { getItems } from '../services/services'
+import BatchManage from '../components/batch_manage'
+import { Dialog, Button, Checkbox, Input, TableColumn, Table, Pagination, Tooltip,Badge} from 'element-ui'
+import {getItems, updateItem, deleteItemById } from '../services/services'
 import globalMixin from "../mixins/globalMixin";
+import Const from "../utils/const";
 export default {
     name: 'monitoring_groups',
     mixins:[globalMixin],
@@ -135,10 +142,13 @@ export default {
         [Table.name]: Table,
         [TableColumn.name]: TableColumn,
         [Pagination.name]: Pagination,
+        [Tooltip.name]: Tooltip,
+        [Badge.name]: Badge,
         Search,
         ContactGroups,
         MoreSetting,
-        WarnSetting
+        WarnSetting,
+        BatchManage
     },
     watch:{
         show(newVal){
@@ -154,15 +164,18 @@ export default {
             tableData: [],
             tableObj:{},
             curTdData:{},
+            tableSelectedData:[],
+            batchManageList:[],
             pages: {
                 total: 6,
                 pageSize: 6,
                 currentPage:1
             },
-            globalEditing: true,       //全局编辑中
+            globalEditing: false,       //全局编辑中
             showContactGroups: false,   //选择联系人开关
             showMoreSettingFlag: false, //更多设置开关
-            showWarnSettingFlag: false
+            showWarnSettingFlag: false,
+            showBatchManageFlag: false
         }
     },
     methods: {
@@ -252,7 +265,6 @@ export default {
          * @param data
          */
         getItemsContact(data){
-            debugger
             const { id,contactGroups } = data;
             let { tableData } = this;
             if(id===undefined || contactGroups===undefined || contactGroups.length<=0) return;
@@ -263,8 +275,6 @@ export default {
                 }
             })
             this.resetData(tableData);
-            // this.tableData = tableData;
-            // this.tableObj = this.arrayToObjectById(tableData);
         },
         /**
          * 处于编辑状态的row添加格外的样式
@@ -325,14 +335,18 @@ export default {
          * @param data
          */
         getWarnSetting({id, list}){
+            console.log('list:',list);
             if(!id) throw 'id 不存在!'
             if(list && list.length>0) {
                 let keysTable = Object.assign({},this.tableObj, {}) ;
                 keysTable[id]['thresholds'] = list;
                 this.tableData = this.tableData.map(item=>{
-                    return keysTable[item.id]
+                    if(item.id===id)
+                        item.editing = true;
+                    return keysTable[item.id];
                 });
                 this.tableObj = keysTable;
+                this.globalEditing = true;
             }
         },
         /**
@@ -350,18 +364,201 @@ export default {
          *  保存数据确认框
          **/
         saveCofirm(){
-            debugger
             if(!this.globalEditing) return;
             this.confirmPop({
                 title: '保存监控项',
-                message: '确定保存或更新监控项信息吗？',
+                message: '确定保存修改的监控项信息吗？',
                 success:()=>this.saveHandle()
             })
         },
-        
-        saveHandle(){
 
-        }
+        /**
+         * 保存更新监控项内容
+         * */
+        saveHandle(){
+            let { tableData } = this;
+            const insertList = this.getSaveList(tableData);
+            let counter = insertList.length;
+            if(!this.checkFormData(insertList)) return false;
+            insertList.map(item=>{
+                updateItem(item).then(res=>{
+                    counter--;
+                    let data = res.data;
+                    if(data && data.status === 'OK'){
+                        this.$message.success(`【${item.name}】 更新成功！`);
+                        this.globalEditing = false;
+                    }else{
+                        this.$message.error(`【${item.name}】 更新失败！`);
+                    }
+                    setTimeout(()=>{
+                        if(counter<=0)
+                            this.getItemList({ device_id: this.localData.id});
+                    }, 30)
+                }).catch(()=>{
+                    counter--;
+                    this.$message.error(`【${item.name}】 更新失败！`);
+                    if(counter<=0)
+                        this.getItemList({ device_id: this.localData.id});
+                })
+            })
+        },
+
+        /**
+         * 新增设备生成的数据
+         * @param arr
+         * @return Array
+         */
+         getSaveList(arr) {
+            if(!arr || arr.length<=0) return [];
+            let temp = [];
+            arr =  arr.filter(item=>item.editing===true);
+            arr.map( (item)=>{
+                let id = item.id;
+                let contact_group_ids = [],
+                    thresholds = [...item.thresholds] || [];
+                item.contact_groups.map(contact=>{
+                    contact_group_ids.push(contact.id);
+                });
+                if(thresholds.length>0){
+                    thresholds.map(threshold=>{
+                        console.log('threshold', threshold);
+                        if(threshold.alarm_level)
+                            delete threshold['alarm_level'];
+                        if(threshold[""])
+                            delete threshold[""];
+                        if(threshold.id)
+                            delete threshold.id;
+                    })
+                }
+                let _item = {
+                    id:id,
+                    "name": item[`name_${item.id}`] || item.name,
+                    "description": item.cell_hook || "",
+                    "cell_hook": item.cell_hook || "",
+                    "retry_count": item.retry_count,
+                    "item_enable": item.item_enable,
+                    "check_interval": item.check_interval,
+                    "check_time_period_id": item.check_time_period_id,
+                    "notification_time_period_id": item.notification_time_period_id,
+                    "notification_interval": item.notification_interval,
+                    "notification_enable": item.notification_enable,
+                    "threshold_type": item.threshold_type,
+                    "unit": item.unit,
+                    "contact_group_ids":contact_group_ids,
+                    "thresholds": thresholds
+                };
+                temp.push(_item);
+            })
+            console.log(temp);
+            return temp
+        },
+
+        /**
+         * 表单数据验证
+         * @param list
+         * @return Boolean
+         */
+        checkFormData(list){
+            if(list && list.length<=0) return false;
+            let flag = true;
+            list.map(item=>{
+                let name = item[`name_${item.id}`] || item.name,
+                    contact_groups_ids = item[`contact_group_ids_${item.id}`] || item.contact_group_ids,
+                    thresholds = item.thresholds;
+                if(name===undefined || !name || name=="") {
+                    this.$message.error('监控项名不能为空！')
+                    flag = false;
+                    return false;
+                }else if(Const.regExp.CHARACTERS.test(name)){
+                    this.$message.error('设备名不能包含特殊字符！')
+                    flag = false;
+                    return false;
+                }else if (!!contact_groups_ids && contact_groups_ids.length <= 0){
+                    this.$message.error(`【${name}】请选择联系人组！`);
+                    flag = false;
+                    return false;
+                }else if (!!thresholds && thresholds.length <= 0){
+                    this.$message.error(`【${name}】请设置告警阈值！`);
+                    flag = false;
+                    return false;
+                }
+            });
+            return flag;
+        },
+
+
+        /**
+         *  删除框确认
+         **/
+        deleteItemsConfirm(){
+            let { tableSelectedData } = this;
+            if(tableSelectedData.length<=0){
+                this.$message.error('请选中要删除的数据！');
+                return false
+            }
+            this.confirmPop({
+                message: '此操作将永久删除该监控项, 是否继续？',
+                success:()=>this.deleteItems(),
+                error:()=>{}
+            });
+        },
+
+        /**
+         * 删除选中监控项
+         */
+        deleteItems(){
+            let selectTab = [...this.tableSelectedData],
+                len = selectTab.length;
+            selectTab.map(item=>{
+                let id = item.id;
+                if(!id && !/^[0-9]*$/.test(id)) return;
+                deleteItemById(id).then(res=>{
+                    len--;
+                    if(res.status === 'OK'){
+                        this.$message.success(`【${item.name}】删除成功！`);
+                    }else
+                        this.$message.error(`【${item.name}】删除失败！`);
+                    if(len<=0)
+                        this.getItemList({ device_id: this.localData.id});
+                }).catch(()=>{
+                    len--;
+                    this.$message.error(`【${item.name}】删除失败！`);
+                    if(len<=0)
+                        this.getItemList({ device_id: this.localData.id});
+                })
+            })
+        },
+        /**
+         * 表格选中项事件
+         **/
+        tableChange(val){
+            this.tableSelectedData = val;
+        },
+        /**
+         * 点击批量操作功能
+         * @return {boolean}
+         */
+        batchManageHandle(){
+            let { tableSelectedData } = this;
+            if(tableSelectedData.length<2){
+                this.showBatchManageFlag = false;
+                this.$message.error('至少选择两项进行操作！');
+                return false;
+            }
+            this.batchManageList = [...this.tableSelectedData];
+            this.showBatchManageFlag = true;
+        },
+
+        getBatchMangeData(arr){
+            console.log(arr);
+            let { tableData } = this;
+            arr.map(item=>{
+                tableData = this.mergeChangeArr(tableData,item);
+            });
+            this.resetData(tableData);
+            this.saveHandle();
+        },
+
     }
 }
 </script>
@@ -405,4 +602,9 @@ export default {
                         color green
                     .el-input__inner
                         color green
+    .el-badge__content.is-fixed.is-dot
+        right 20px
+        top 8px
+    .el-badge
+        vertical-align baseline
 </style>

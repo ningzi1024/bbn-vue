@@ -656,6 +656,7 @@ export default {
                 return false
             }
             this.confirmPop({
+                message: '此操作将永久删除该设备, 是否继续？',
                 success:()=>this.deleteDevicesById(),
                 error:()=>{}
             });
@@ -710,7 +711,7 @@ export default {
             let { tableData } = this;
             arr.map(item=>{
                 tableData = this.mergeChangeArr(tableData,item);
-            })
+            });
             this.tableData = tableData;
             this.saveHandle();
             // console.log('批量操作，返回数据',arr);

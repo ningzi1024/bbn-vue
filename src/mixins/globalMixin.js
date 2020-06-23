@@ -234,7 +234,7 @@ export default {
          */
         getSameKeyById(item){
             let id = item.id,
-                len = id.length+1;
+                len = typeof id==='string'?id.length+1:String(id).length+1;
             if(!item || !id) return {};
             for(let key in item) {
                 let val = item[key];

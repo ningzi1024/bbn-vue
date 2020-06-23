@@ -38,6 +38,11 @@ const ApiMethods = {
             }
         })
     },
+    deleteById(url, id){
+        return new Promise((resolve, reject)=>{
+            service.delete(url+id).then(res=>resolve(res.data)).catch(err=>reject(err));
+        })
+    },
     put(url, params){
         return new Promise((resolve, reject)=>{
             service.put(url, params).then(res=>resolve(res.data)).catch(err=>reject(err))
