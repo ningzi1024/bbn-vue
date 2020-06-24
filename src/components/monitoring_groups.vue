@@ -117,7 +117,7 @@ import MoreSetting from './more_setting'
 import WarnSetting from './warn_setting'
 import BatchManage from '../components/batch_manage'
 import { Dialog, Button, Checkbox, Input, TableColumn, Table, Pagination, Tooltip,Badge} from 'element-ui'
-import {getItems, updateItem, deleteItemById } from '../services/services'
+import {getItems, updateItem, deleteItemById, getItemsById} from '../services/services'
 import globalMixin from "../mixins/globalMixin";
 import Const from "../utils/const";
 export default {
@@ -153,19 +153,17 @@ export default {
     watch:{
         show(newVal){
             if(newVal===true){
-                this.id = this.localData && this.localData.id
                 this.getItemList({ device_id: this.localData.id});
             }
         }
     },
     data(){
         return {
-            id: 0,
-            tableData: [],
-            tableObj:{},
-            curTdData:{},
-            tableSelectedData:[],
-            batchManageList:[],
+            tableData: [],          /*表单数据*/
+            tableObj:{},            /*表单数据model*/
+            curTdData:{},           /*当前操作的表格行数据*/
+            tableSelectedData:[],   /*选中的数据*/
+            batchManageList:[],     /*参加批量操作的数据*/
             pages: {
                 total: 6,
                 pageSize: 6,
@@ -174,8 +172,8 @@ export default {
             globalEditing: false,       //全局编辑中
             showContactGroups: false,   //选择联系人开关
             showMoreSettingFlag: false, //更多设置开关
-            showWarnSettingFlag: false,
-            showBatchManageFlag: false
+            showWarnSettingFlag: false, //告警阈值显示开关
+            showBatchManageFlag: false  //批量操作显示开关
         }
     },
     methods: {
@@ -199,6 +197,9 @@ export default {
             this.pages.currentPage = 1;
             this.tableData = [];
             this.tableObj = {};
+            this.curTdData = {};
+            this.tableSelectedData = [];
+            this.batchManageList = [];
             this.$emit('update:show', false);
         },
 
@@ -254,9 +255,20 @@ export default {
         /**
          * 点击打开选择联系人组
          */
-        selectContactGroups(obj){
+        async selectContactGroups(obj){
             if(!obj) return;
             this.curTdData= obj;
+            //如果没有数据，去api里获取，并更新数据
+            if(obj.contact_groups.length<=0) {
+                let { tableData } = this;
+                let data = await getItemsById(obj.id);
+                obj.contact_groups = data.contact_groups;
+                tableData.map(item=>{
+                    if(item.id === obj.id)
+                        item.contact_groups = data.contact_groups;
+                });
+                this.resetData(tableData);
+            }
             this.showContactGroups = true;
         },
 
@@ -322,12 +334,24 @@ export default {
         },
 
         /**
-         * 告警阈值组件显示控制
+         * 告警阈值组件控制
          * @param data
          */
-        selectWarns(data){
+        async selectWarns(obj){
+
+            this.curTdData = obj;
+            //如果没有数据，去api里获取，并更新数据
+            if(obj.thresholds.length<=0) {
+                let { tableData } = this;
+                let data = await getItemsById(obj.id);
+                obj.thresholds = data.thresholds;
+                tableData.map(item=>{
+                    if(item.id === obj.id)
+                        item.thresholds = data.thresholds;
+                });
+                this.resetData(tableData);
+            }
             this.showWarnSettingFlag = true;
-            this.curTdData = data;
         },
 
         /**
