@@ -145,13 +145,13 @@
         </el-pagination>
 
         <!--        联系人组组件-->
-        <ContactGroups 
+        <ContactGroups
             :show.sync = "contactGroupsShow"
             :localData = "curTdData"
             @callBack = "getDeviceContact" />
 
         <!--        更多设置组件-->
-        <MoreSetting 
+        <MoreSetting
             :show.sync = "showMoreSettingFlag"
             :localData = "curTdData"
             @callBack = "getMoreSetting"/>
@@ -172,16 +172,16 @@
 </template>
 
 <script>
-import { getDevices, getDeviceGroups, addDevice, deleteDevice, updateDevice } from '../services/services'
-import ContactGroups from '../components/contact_groups'
-import MoreSetting from '../components/more_setting'
-import Search from '../components/search'
-import AddDevices from '../components/add_device_component'
-import BatchManage from '../components/batch_manage'
-import Monitoring from '../components/monitoring_groups'
+import { getDevices, getDeviceGroups, addDevice, deleteDevice, updateDevice } from '../../services/services'
+import ContactGroups from '../../components/contact_groups'
+import MoreSetting from '../../components/more_setting'
+import Search from '../../components/search'
+import AddDevices from '../../components/add_device_component'
+import BatchManage from '../../components/batch_manage'
+import Monitoring from '../../components/monitoring_groups'
 import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox, Pagination } from 'element-ui'
-import globalMixin from "../mixins/globalMixin";
-import Const from '../utils/const'
+import globalMixin from "../../mixins/globalMixin";
+import Const from '../../utils/const'
 
 export default {
     name: 'home',
