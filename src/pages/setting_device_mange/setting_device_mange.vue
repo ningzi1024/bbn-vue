@@ -182,6 +182,7 @@ import Monitoring from '../../components/monitoring_groups'
 import { Select, Option, Input, Button, ButtonGroup, Badge, Tooltip, Table, TableColumn, Checkbox, Pagination } from 'element-ui'
 import globalMixin from "../../mixins/globalMixin";
 import Const from '../../utils/const'
+import Api from '../../services/apiMethods'
 
 export default {
     name: 'home',
@@ -232,6 +233,12 @@ export default {
         }
     },
     mounted() {
+        Api.get('/overview/environment', {
+            type:3,
+            device_id:100
+        }).then(res=>{
+            console.log(res);
+        })
         this.init();
     },
     methods: {
@@ -321,7 +328,7 @@ export default {
                 console.log(item);
                 if(item.isNew){
                     addDevice(item).then(res=>{
-                        if(res.data && res.data.id>0) {
+                        if(res && res.id>0) {
                             this.$message.success(`【${item.name}】保存成功！`);
                             this.globaEditing = false;
                             counter--;
@@ -337,7 +344,7 @@ export default {
                 }else{
                     updateDevice(item).then(res=>{
                         counter--;
-                        if(res.data && res.data.status==="OK"){
+                        if(res && res.status==="OK"){
                             this.$message.success(`【${item.name}】 更新成功！`);
                             this.globaEditing = false;
                         }else{

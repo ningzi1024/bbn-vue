@@ -1,7 +1,7 @@
 let getPages = require('./getPages');
 const autoprefixer = require('autoprefixer');
 const pxtorem = require('postcss-pxtorem');
-const webpack = require('webpack')
+const webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin')
 const pages = getPages('./src/pages/**?/*.html');
 

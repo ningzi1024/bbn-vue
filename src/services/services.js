@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Api from './apiMethods'
-const baseUrl = '/api/v1/';
+
+const baseUrl = '';//'/api/v1/';
 const token = sessionStorage.getItem('token') || localStorage.getItem('token');
 const headers = {
     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -14,13 +15,7 @@ export function getDevices(data= {}){
 
 //添加一项设备
 export function addDevice(data = {}) {
-    //apiMethods 内post 方法需要优化，暂时用这个
-    return axios({
-        method: 'post',
-        url: baseUrl+'setting/devices',
-        data: data,
-        headers:headers
-    });
+    Api.post('setting/devices', data);
 }
 
 //获取联系人组数据
@@ -66,13 +61,7 @@ export function deleteDevice(data={}) {
 export function updateDevice(data= {}) {
     const id = data.id;
     if(!id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
-    // return Api.put(baseUrl+'setting/devices/'+ id, data);
-    return axios({
-        method: 'put',
-        url: baseUrl+'setting/devices/'+id,
-        data: data,
-        headers: headers
-    });
+    return Api.put(baseUrl+'setting/devices/'+ id, data);
 }
 
 /**
@@ -113,15 +102,27 @@ export function updateItem(data = {}) {
     if(!data || !id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
     let params = {...data};
     delete params.id;
-    return axios({
-        method: 'put',
-        url: baseUrl+'setting/items/'+id,
-        data: params,
-        headers: headers
-    });
+    return Api.put(baseUrl+'setting/devices/'+ id, params);
+
+    // return axios({
+    //     method: 'put',
+    //     url: baseUrl+'setting/items/'+id,
+    //     data: params,
+    //     headers: headers
+    // });
 }
 
+//删除监控项
 export function deleteItemById(id) {
     if(!id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
     return Api.deleteById(baseUrl+'setting/items/', id);
+}
+
+//获取语言数据
+export function getLangJson(url, data) {
+    return new Promise(( resolve, reject)=>{
+        axios.get(url, {
+            params:data
+        }).then(res=>resolve(res.data)).catch(err=>reject(err));
+    })
 }

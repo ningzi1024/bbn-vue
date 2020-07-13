@@ -16,7 +16,7 @@
                         </el-tooltip>
                         <el-tooltip effect="dark" content="保存">
                             <el-badge :is-dot="globalEditing" class="item">
-                                <el-button class="share-button" icon="el-icon-tickets" @click="saveCofirm"></el-button>
+                                <el-button class="share-button" icon="el-icon-tickets" @click="saveConfirm"></el-button>
                             </el-badge>
                         </el-tooltip>
                         <el-tooltip effect="dark" content="批量编辑">
@@ -200,6 +200,7 @@ export default {
             this.curTdData = {};
             this.tableSelectedData = [];
             this.batchManageList = [];
+            this.globalEditing = false;
             this.$emit('update:show', false);
         },
 
@@ -284,6 +285,7 @@ export default {
                 if(item.id === id){
                     item.contact_groups = contactGroups;
                     item.editing = true;
+                    this.globalEditing = true;
                 }
             })
             this.resetData(tableData);
@@ -387,7 +389,7 @@ export default {
         /**
          *  保存数据确认框
          **/
-        saveCofirm(){
+        saveConfirm(){
             if(!this.globalEditing) return;
             this.confirmPop({
                 title: '保存监控项',
