@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './setting_device_mange.vue'
 import '../../utils/flexible'
 import { Message, MessageBox } from 'element-ui'
-import I18n from '../../assets/lang/index'
+import i18n from '../../assets/lang/index'
 
 
 import '../../assets/style/reset.css'
@@ -14,5 +14,6 @@ Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm
 
 new Vue({
+  i18n,
   render: h => h(App),
 }).$mount('#app')

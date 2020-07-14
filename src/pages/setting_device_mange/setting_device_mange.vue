@@ -33,7 +33,7 @@
                 <el-table-column type="selection"/>
                 <el-table-column
                         width="180"
-                       label="设备名称">
+                       :label="$t('SETTING.DEVICES.DEVICE_NAME')">
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
@@ -43,7 +43,7 @@
                         </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column label="站点"  width="200">
+                <el-table-column :label="$t('SETTING.DEVICES.DEVICE_GROUP')"  width="200">
                     <template slot-scope="scope">
                         <el-select
                                 size="small"
@@ -59,7 +59,7 @@
                         </el-select>
                     </template>
                 </el-table-column>
-                <el-table-column label="分类" prop="sort">
+                <el-table-column :label="$t('SETTING.DEVICES.SORT')" prop="sort">
 <!--                    <template slot-scope="scope">-->
 <!--                        <el-input-->
 <!--                                size="small"-->
@@ -68,7 +68,7 @@
 <!--                        </el-input>-->
 <!--                    </template>-->
                 </el-table-column>
-                <el-table-column label="IP地址" width="150">
+                <el-table-column :label="$t('SETTING.DEVICES.IP_ADDRESS')" width="150">
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
@@ -77,7 +77,7 @@
                         </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column label="端口号">
+                <el-table-column :label="$t('SETTING.DEVICES.PORT')">
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
@@ -86,7 +86,7 @@
                         </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column label="协议ID">
+                <el-table-column :label="$t('SETTING.DEVICES.ADDRESS_485')">
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
@@ -95,7 +95,7 @@
                         </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column label="被动连接注册包">
+                <el-table-column :label="$t('SETTING.DEVICES.PASSIVE_CONNECTION_REGISTRATION_PACKAGE')">
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
@@ -104,26 +104,26 @@
                         </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column label="被动链接">
+                <el-table-column :label="$t('SETTING.DEVICES.CONNECTION')">
                     <template slot-scope="scope">
                         <el-checkbox v-model="tableDataByKeys[scope.row.id][`passive_enable_${scope.row.id}`]" @change="((val)=>{inputName(val, scope.row.id, 'passive_enable_')})"></el-checkbox>
                     </template>
                 </el-table-column>
-                <el-table-column label="联系人组">
+                <el-table-column :label="$t('SETTING.DEVICES.CONTACT_GROUP')">
                     <template slot-scope="scope">
                         <div style="cursor:pointer">
                             <i class="el-icon-s-order" @click="selectContactGroups(scope.row)" style="font-size: 16px; color:#54b5ff"></i>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="监控项">
+                <el-table-column :label="$t('SETTING.DEVICES.ITEMS')">
                     <template slot-scope="scope">
                         <div style="cursor:pointer">
                             <i class="el-icon-s-order" @click="showItsMonitoring(scope.row)" style="font-size: 16px; color:#54b5ff;"></i>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="更多">
+                <el-table-column :label="$t('SETTING.DEVICES.MORE')">
                     <template slot-scope="scope">
                         <div style="cursor:pointer">
                             <i class="el-icon-s-order" @click="showMoreSetting(scope.row)" style="font-size: 16px;color:#54b5ff"></i>

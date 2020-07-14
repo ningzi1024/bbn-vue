@@ -1,4 +1,4 @@
-{
+export default {
     "COMMON": {
         "CONFIRM": "confirm",
         "CANCEL": "cancel",

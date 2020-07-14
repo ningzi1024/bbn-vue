@@ -1,4 +1,4 @@
-{
+export default {
     "COMMON": {
         "CONFIRM": "确定",
         "CANCEL": "取消",
