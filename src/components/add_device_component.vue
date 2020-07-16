@@ -380,21 +380,22 @@ export  default {
                 &:nth-child(1)
                     top 35%
                     left 50%
-                    margin-left -28px
+                    transform: translateX(-35%);
                 &:nth-child(2)
                     top 52%
                     left 50%
-                    margin-left -28px
+                    transform: translateX(-35%);
             .el-button--mini, .el-button--mini.is-round
-                padding 7px 9px        
+                padding 7px 9px
+            .el-button+.el-button
+                margin-left 0
         .new-devices-tab
             width 860px
             height 315px
             display inline-block
             /*float right*/
             border 1px solid #c8c8ca
-            overflow-x hidden
-            overflow-y auto
+            overflow hidden
             position absolute
             right 0
             table
@@ -430,4 +431,8 @@ export  default {
                             border-color #C0C4CC
                         &:focus
                             border-color #54b5ff
+            .el-table--border, .el-table--group
+                border none
+            .el-table::before
+                display none
 </style>
