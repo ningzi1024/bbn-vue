@@ -5,6 +5,7 @@
                 :title="`【${localData && localData.name || ''}】- 监控项`"
                 :visible="show"
                 width="100%"
+                top="5vh"
                 :close-on-click-modal="false"
                 @close="btnCancel">
             <div class="opt">
@@ -607,7 +608,8 @@ export default {
                     color #fff
         .tabCon
             margin 20px 0
-            height 400px
+            /*height 400px*/
+            height 45vh
             overflow-x hidden
             overflow-y auto
             table

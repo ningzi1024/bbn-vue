@@ -36,11 +36,7 @@ instance.interceptors.response.use(response=>{
     }
     if(response.status && response.status === 200){
         return response;
-    }else
-    if (response.status && response.status === 500 || response.status === 502 || response.status === 404) {
-        if(response.error!==undefined)
-            return response;
-        else
+    } else if (response.status && response.status === 500 || response.status === 502 || response.status === 404) {
             this.$message({
                 type: "error",
                 showClose: true,
@@ -51,6 +47,19 @@ instance.interceptors.response.use(response=>{
     }
 }, error=>{
     console.error('请求失败',error);
+    errorEvent(error.response);
+    return error.response.data;
 });
+
+/**
+ * 处理捕获的异常
+ * @param error
+ */
+function errorEvent(error){
+    if(!error) return;
+    if(error.status==401){
+        window.top.location.href = '/login.html';
+    }
+}
 
 export default instance;
