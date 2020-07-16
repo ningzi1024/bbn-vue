@@ -607,9 +607,9 @@ export default {
                 .el-dialog__close
                     color #fff
         .tabCon
-            margin 20px 0
+            margin 15px 0
             /*height 400px*/
-            height 45vh
+            height 35vh
             overflow-x hidden
             overflow-y auto
             table

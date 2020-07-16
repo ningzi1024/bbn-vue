@@ -34,8 +34,7 @@
                         <template slot-scope="scope">
                             <el-input
                                     size="small"
-                                    v-model="tabObj[scope.row.id][`model_${scope.row.id}`]"
-                                    @input="((val)=>{inputName(val, scope.row.id, `model_${scope.row.id}`)})">
+                                    v-model="scope.row[`model_${scope.row.id}`]">
                             </el-input>
                         </template>
                     </el-table-column>
@@ -43,8 +42,7 @@
                         <template slot-scope="scope">
                             <el-input
                                     size="small"
-                                    v-model="tabObj[scope.row.id][`amount_${scope.row.id}`]"
-                                    @input="((val)=>{inputName(val, scope.row.id, `amount_${scope.row.id}`)})">
+                                    v-model="scope.row[`amount_${scope.row.id}`]">
                             </el-input>
                         </template>
                     </el-table-column>
@@ -52,8 +50,7 @@
                         <template slot-scope="scope">
                             <el-input
                                     size="small"
-                                    v-model="tabObj[scope.row.id][`ipv4_${scope.row.id}`]"
-                                    @input="((val)=>{inputName(val, scope.row.id, `ipv4_${scope.row.id}`)})">
+                                    v-model="scope.row[`ipv4_${scope.row.id}`]">
                             </el-input>
                         </template>
                     </el-table-column>
@@ -61,15 +58,14 @@
                         <template slot-scope="scope">
                             <el-input
                                     size="small"
-                                    v-model="tabObj[scope.row.id][`protocol_id_${scope.row.id}`]"
-                                    @input="((val)=>{inputName(val, scope.row.id, `protocol_id_${scope.row.id}`)})">
+                                    v-model="scope.row[`protocol_id_${scope.row.id}`]">
                             </el-input>
                         </template>
                     </el-table-column>
                     <el-table-column label="站点" >
                         <template slot-scope="scope">
                             <el-select
-                                    v-model="tabObj[scope.row.id][`device_${scope.row.id}`]"
+                                    v-model="scope.row[`device_${scope.row.id}`]"
                                     placeholder="选择站点"
                                     size="small"
                                     @change="(val)=>selectChange(val, scope.row.id)">
@@ -198,7 +194,7 @@ export  default {
                     driver: item.driver,
                     timeout: item.timeout||100,
                     device_template_id: item.type,
-                    category_id: item[`category_id_${id}`],
+                    category_id: item.category_id,
                     contact_group_ids: [],
                     // items:[],
                     device_group_ids: [item[`device_${id}`]],
@@ -206,7 +202,7 @@ export  default {
                     contact_groups:[],
                     "485_address": item[`protocol_id_${id}`] || "",
                     protocol_id: item[`protocol_id_${id}`] || "",
-                    sort: item[`category_${id}`] || "",
+                    sort: item.category || "",
                     editing: true,      //编辑状态
                     device_groups: this.deviceGroups,  //机房信息
                     isNew: true         //是否是新添加的数据
@@ -255,21 +251,6 @@ export  default {
             this.treeData = this.arrayToTree(data);
         },
 
-        /**
-         * 修改数据
-         * @param val
-         * @param id
-         * @param name
-         */
-        inputName(val, id ,name){
-            let { tabObj,tableData } = this;
-            tabObj[id][name] = val;
-            this.tabObj = tabObj;
-            this.tableData = tableData.map(item=>{
-                return tabObj[item.id]
-            });
-        },
-
         selectContactGroups(data){
             console.log(data);
         },
@@ -287,26 +268,17 @@ export  default {
          * 选中数据加入到表格中
          */
         joinToTable(){
-            // debugger
-            let { tempTabData, treeDataSelected } = this;
-            let checkNodes = treeDataSelected;//this.$refs.myTree.getCheckedNodes();
-            // let arr = checkNodes.filter(item=>item.id>0);
-            console.log(this.treeDataSelected);
-            let arr2 = Object.assign([],checkNodes,[]);
-
-            arr2.map(item=>{
-                if(!item.amount)
-                    item.amount = 1;
-                if(!item.device)
-                    item.device = 1;
-            });
-            arr2 = this.replaceKey(Object.assign([],arr2,[]),'id','type');
-            arr2  = this.copyKeysByParam(Object.assign([],arr2,[]), 'id');
-            this.tempTabData = tempTabData.concat(Object.assign([],arr2,[]));
-            this.tabObj = this.arrayToObjectById(this.tempTabData);
-            this.tableData = this.tableData.concat(Object.assign([],arr2,[]));
-            // this.$refs.myTree.setCheckedKeys([])
-            // this.deviceTemplates();
+            const selectedData = this.$refs.myTree.getCheckedNodes();
+            let treeDataSelected = this.deepCopy(selectedData).filter(item=> item.brand != undefined);
+            let len = this.tableData.length+1;
+            treeDataSelected.map((item,index)=>{
+                item.id = `new${len+index}`;
+                item.amount = 1;
+                item.device = this.deviceGroups[0].id;
+            })
+            treeDataSelected = this.copyKeysByParam(treeDataSelected, 'id',['model','amount','ipv4','protocol_id','device']);
+            this.tableData = [...this.tableData, ...treeDataSelected];
+            console.log(this.tableData);
         },
         /**
          * 移除表格选中项数据
@@ -327,7 +299,6 @@ export  default {
          */
         selectChange(selectId, id){
             console.log('selectChange', selectId);
-            this.inputName(selectId,id, `device_${id}`)
         },
 
         /**
@@ -367,8 +338,7 @@ export  default {
 
         treeChange(){
             let selectedData = this.$refs.myTree.getCheckedNodes();
-            this.treeDataSelected = selectedData.filter(item=>item.id>0);
-            // console.log(this.treeDataSelected);
+            this.treeDataSelected = selectedData.filter(item=> item.brand != undefined);
         }
     }
 }
@@ -440,4 +410,24 @@ export  default {
                     padding 12px 0
                 td
                     text-align center
+                    .myInput
+                        -webkit-appearance: none;
+                        background-color: #FFF;
+                        background-image: none;
+                        border-radius: 4px;
+                        border: 1px solid #DCDFE6;
+                        box-sizing: border-box;
+                        color: #606266;
+                        display: inline-block;
+                        font-size: inherit;
+                        height: 32px;
+                        line-height: 32px;
+                        outline: 0;
+                        padding: 0 15px;
+                        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+                        width: 100%;
+                        &:hover
+                            border-color #C0C4CC
+                        &:focus
+                            border-color #54b5ff
 </style>

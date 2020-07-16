@@ -36,7 +36,8 @@ instance.interceptors.response.use(response=>{
     }
     if(response.status && response.status === 200){
         return response;
-    } else if (response.status && response.status === 500 || response.status === 502 || response.status === 404) {
+    }else
+    if (response.status && response.status === 500 || response.status === 502 || response.status === 404) {
             this.$message({
                 type: "error",
                 showClose: true,

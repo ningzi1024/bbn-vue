@@ -31,8 +31,7 @@
                 @selection-change="tableChange"
                 border>
                 <el-table-column type="selection"/>
-                <el-table-column
-                        width="180"
+                <el-table-column width="130"
                        :label="$t('SETTING.DEVICES.DEVICE_NAME')">
                     <template slot-scope="scope">
                         <el-input
@@ -43,7 +42,7 @@
                         </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('SETTING.DEVICES.DEVICE_GROUP')"  width="200">
+                <el-table-column :label="$t('SETTING.DEVICES.DEVICE_GROUP')" width="140">
                     <template slot-scope="scope">
                         <el-select
                                 size="small"
@@ -104,7 +103,7 @@
                         </el-input>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('SETTING.DEVICES.CONNECTION')">
+                <el-table-column :label="$t('SETTING.DEVICES.CONNECTION')" >
                     <template slot-scope="scope">
                         <el-checkbox v-model="tableDataByKeys[scope.row.id][`passive_enable_${scope.row.id}`]" @change="((val)=>{inputName(val, scope.row.id, 'passive_enable_')})"></el-checkbox>
                     </template>
@@ -769,16 +768,19 @@ export default {
             td
                 text-align center
                 padding 10px 0
-                &:nth-child(1)
-                    width 48px
-                &:nth-child(2)
-                    width 180px
-                &:nth-child(3)
-                    width 200px
-                &:nth-child(4)
-                    width 163px
+                /*&:nth-child(1)*/
+                /*    width 48px*/
+                /*&:nth-child(2)*/
+                /*    width 180px*/
+                /*&:nth-child(3)*/
+                /*    width 200px*/
+                /*&:nth-child(4)*/
+                /*    width 163px*/
             .el-input
                 width 90%
+            .el-input__inner
+                padding 0 8px
+
         .editing
             .el-input__inner
                 color green

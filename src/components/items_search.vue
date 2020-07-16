@@ -191,4 +191,11 @@ export default {
     width 70%
     display inline-block
     background none!important
+    .selectCon
+        width 220px
+        margin 0 8px
+    .input-with-select
+        width 330px
+.setting-device-wrap .input-keyword
+    width 330px!important
 </style>

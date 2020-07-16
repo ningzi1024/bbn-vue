@@ -1,4 +1,5 @@
 import moment from 'moment'
+import deepcopy from 'deepcopy'
 export default {
     name: "globalMixin",
     created(){
@@ -162,13 +163,14 @@ export default {
          */
         replaceKey(arr, localKey, curKey){
             if(!arr || arr.length<=0 || !localKey || !curKey) return arr;
-            let temp = arr;
+            let temp = [...arr];
             temp.map(item=>{
-              item[curKey] = item[localKey];
-              delete item[localKey];
-              if(localKey==='id') {
-                item.id = item[curKey]+'_'+moment().format('X');
-              }
+                item[curKey] = item[curKey] || item[localKey];
+                delete item[localKey];
+                if(localKey==='id') {
+                    let val = item[curKey]//item[curKey].indexOf('_')>0?item[curKey].split('_')[0]:item[curKey]
+                    item.id = val+'_'+moment().format('X');
+                }
             })
             return temp;
         },
@@ -184,7 +186,15 @@ export default {
         copyKeysByParam(arr=[], suffix='id', keys=[]){
             if(arr.length<=0 || !suffix) return[];
             let keyMap = {};
-            let temp = arr.slice();
+            let temp = [...arr];
+            temp.map(items=>{
+                let suffix_val = items.type+'_';
+                for(let item in items){
+                    if(item.indexOf(suffix_val)>0)
+                        delete items[item];
+                }
+            });
+
             if(keys && keys.length>0) {
                 keys.map(item=>{
                     if(!keyMap[item])
@@ -246,5 +256,14 @@ export default {
             }
             return item;
         },
+
+        /**
+         * 数组对象深拷贝
+         * @param data
+         * @returns {*}
+         */
+        deepCopy(data){
+            return deepcopy(data);
+        }
     }
 }

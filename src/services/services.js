@@ -3,10 +3,6 @@ import Api from './apiMethods'
 
 const baseUrl = '';//'/api/v1/';
 const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-const headers = {
-    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-    'Authorization':'Bearer ' + token
-};
 const regNum = /^[0-9]*$/;
 //获取设备列表
 export function getDevices(data= {}){
@@ -15,7 +11,7 @@ export function getDevices(data= {}){
 
 //添加一项设备
 export function addDevice(data = {}) {
-    Api.post('setting/devices', data);
+    return Api.post('setting/devices', data);
 }
 
 //获取联系人组数据
