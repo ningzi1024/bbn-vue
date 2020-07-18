@@ -90,8 +90,8 @@
             </div>
         </div>
         <div slot="footer" class="dialog-footer">
-            <el-button @click.stop="btnCancel">取 消</el-button>
-            <el-button type="primary" @click="btnSure">确 定</el-button>
+            <el-button @click.stop="btnCancel">{{ $t('COMMON.CANCEL') }}</el-button>
+            <el-button type="primary" @click="btnSure">{{ $t('COMMON.CONFIRM') }}</el-button>
         </div>
     </el-dialog>
 </template>
@@ -170,7 +170,6 @@ export  default {
                     return;
                 }
                 let id = item.id;
-                debugger
                 tabList.push({
                     amount: item[`amount_${id}`],
                     device_group_id: item[`device_${id}`],

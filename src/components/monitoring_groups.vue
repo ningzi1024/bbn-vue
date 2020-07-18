@@ -2,7 +2,7 @@
     <div class="monitoring-wrap">
         <el-dialog
                 class="monitoring-con"
-                :title="`【${localData && localData.name || ''}】- 监控项`"
+                :title="`【${localData && localData.name || ''}】- ${$t('SETTING.ITEMS.ITEMS')}`"
                 :visible="show"
                 width="100%"
                 top="5vh"
@@ -36,7 +36,7 @@
                     @selection-change="tableChange"
                     border>
                     <el-table-column type="selection"/>
-                    <el-table-column label="监控项名称">
+                    <el-table-column :label="$t('SETTING.ITEMS.ITEM_NAME')">
                         <template slot-scope="scope">
                             <el-input
                                     size="small"
@@ -45,23 +45,23 @@
                             </el-input>
                         </template>
                     </el-table-column>
-                    <el-table-column label="监控项ID" prop="id"></el-table-column>
-                    <el-table-column label="脚本" prop="script"></el-table-column>
-                    <el-table-column label="联系人组">
+                    <el-table-column :label="$t('SETTING.ITEMS.ITEM_ID')" prop="id"></el-table-column>
+                    <el-table-column :label="$t('SETTING.ITEMS.SCRIPT')" prop="script"></el-table-column>
+                    <el-table-column :label="$t('SETTING.ITEMS.CONTACT_GROUP')">
                         <template slot-scope="scope">
                             <div style="cursor:pointer">
                                 <i class="el-icon-s-order" @click="selectContactGroups(scope.row)" style="font-size: 16px; color:#54b5ff"></i>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="告警阈值">
+                    <el-table-column :label="$t('SETTING.ITEMS.ALARM_THRESHOLD')">
                         <template slot-scope="scope">
                             <div style="cursor:pointer">
                                 <i class="el-icon-s-order" @click="selectWarns(scope.row)" style="font-size: 16px; color:#54b5ff"></i>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="更多">
+                    <el-table-column :label="$t('SETTING.ITEMS.MORE')">
                         <template slot-scope="scope">
                             <div style="cursor:pointer">
                                 <i class="el-icon-s-order" @click="showMoreSetting(scope.row)" style="font-size: 16px;color:#54b5ff"></i>

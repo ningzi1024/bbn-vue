@@ -1,7 +1,7 @@
 <template>
     <div class="contact_groups">
         <el-dialog
-                :title="`选择联系组 【${localData && localData.name}】`"
+                :title="`${$t('SETTING.CONTACT_GROUPS.CONTACT_GROUPS')} 【${localData && localData.name}】`"
                 :visible="dialogVisible"
                 width="370px"
                 @close="btnCancel"
@@ -13,13 +13,13 @@
                     style="width: 100%" height="300px">
                 <el-table-column type="selection"/>
                 <el-table-column
-                        label="联系人组"
+                        :label="$t('SETTING.CONTACT_GROUPS.CONTACT_GROUPS')"
                         prop="name">
                 </el-table-column>
             </el-table>
             <div slot="footer" class="dialog-footer">
-                <el-button @click.stop="btnCancel">取 消</el-button>
-                <el-button type="primary" @click="btnSure">确 定</el-button>
+                <el-button @click.stop="btnCancel">{{ $t('COMMON.CANCEL') }}</el-button>
+                <el-button type="primary" @click="btnSure">{{ $t('COMMON.CONFIRM') }}</el-button>
             </div>
         </el-dialog>
     </div>

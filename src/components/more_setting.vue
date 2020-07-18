@@ -8,7 +8,7 @@
                 @close="btnCancel">
             <table class="more-setting-tab">
                 <tr>
-                    <td width="25%">检查间隔/秒</td>
+                    <td width="25%">{{ $t('SETTING.DEVICES.MORE_ITEM.CHECK_INTERVAL/S') }}</td>
                     <td>
                         <el-input
                             v-model="moreData.check_interval"
@@ -17,7 +17,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>重复次数/次</td>
+                    <td>{{ $t('SETTING.DEVICES.MORE_ITEM.REPETITIONS/TIME') }}</td>
                     <td>
                         <el-input
                             v-model="moreData.retry_count"
@@ -26,7 +26,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>检查时间段</td>
+                    <td>{{ $t('SETTING.DEVICES.MORE_ITEM.CHECK_PERIOD') }}</td>
                     <td>
                         <el-select
                                 v-model="check_time_period_name"
@@ -41,7 +41,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>通知时间段</td>
+                    <td>{{ $t('SETTING.DEVICES.MORE_ITEM.NOTIFICATION_PERIOD') }}</td>
                     <td>
                         <el-select
                                 v-model="notifications_time_period_name"
@@ -56,7 +56,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>通知事件/秒</td>
+                    <td>{{ $t('SETTING.DEVICES.MORE_ITEM.NOTIFICATION_INTERVAL/S') }}</td>
                     <td>
                         <el-input
                             v-model="moreData.notifications_interval"
@@ -65,7 +65,7 @@
                     </td>
                 </tr>
                 <tr  v-if="model==='devices'">
-                    <td>驱动</td>
+                    <td>{{ $t('SETTING.DEVICES.MORE_ITEM.PROTOCOL') }}</td>
                     <td>
                         <el-input
                             v-model="moreData.driver"
@@ -75,27 +75,27 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>启用通知</td>
+                    <td>{{ $t('SETTING.DEVICES.MORE_ITEM.ENABLE_NOTIFICATION') }}</td>
                     <td>
                         <el-checkbox v-model="moreData.notifications_enable"/>
                     </td>
                 </tr>
                 <tr v-if="model==='devices'">
-                    <td>启用 zigbee</td>
+                    <td>{{ $t('SETTING.DEVICES.MORE_ITEM.ENABLE_ZIGBEE') }}</td>
                     <td>
                         <el-checkbox v-model="moreData.zigbee_enabled"/>
                     </td>
                 </tr>
                 <tr>
-                    <td>禁用设备</td>
+                    <td>{{ $t('SETTING.DEVICES.MORE_ITEM.DISABLE_EQUIPMENT') }}</td>
                     <td>
                         <el-checkbox v-model="moreData.device_enabled"/>
                     </td>
                 </tr>
             </table>
             <div slot="footer" class="dialog-footer">
-                <el-button @click.stop="btnCancel">取 消</el-button>
-                <el-button type="primary" @click="btnSure">确 定</el-button>
+                <el-button @click.stop="btnCancel">{{ $t('COMMON.CANCEL') }}</el-button>
+                <el-button type="primary" @click="btnSure">{{ $t('COMMON.CONFIRM') }}</el-button>
             </div>
         </el-dialog>
     </div>
