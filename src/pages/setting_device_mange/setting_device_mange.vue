@@ -319,13 +319,14 @@ export default {
          *  保存设备，更新设备
          **/
         saveHandle(){
-            let { tableData } = this;
+            let tableData = this.deepCopy(this.tableData);
             const insertList = this.getSaveList(tableData);
             let counter = insertList.length;
             if(!this.checkFormData(insertList)) return false;
             insertList.map(item=>{
                 console.log(item);
                 if(item.isNew){
+                    delete item.id;
                     addDevice(item).then(res=>{
                         if(res && res.id>0) {
                             this.$message.success(`【${item.name}】保存成功！`);
@@ -340,6 +341,7 @@ export default {
                         if(counter<=0)
                             this.init();
                     })
+
                 }else{
                     updateDevice(item).then(res=>{
                         counter--;

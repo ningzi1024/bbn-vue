@@ -49,7 +49,7 @@ instance.interceptors.response.use(response=>{
 }, error=>{
     console.error('请求失败',error);
     errorEvent(error.response);
-    return error.response.data;
+    return error;
 });
 
 /**

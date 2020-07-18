@@ -170,6 +170,7 @@ export  default {
                     return;
                 }
                 let id = item.id;
+                debugger
                 tabList.push({
                     amount: item[`amount_${id}`],
                     device_group_id: item[`device_${id}`],
@@ -179,7 +180,7 @@ export  default {
                     ip_address: item[`ipv4_${id}`],
                     port: item[`port_${id}`],
                     protocol_version: item.protocol_version||'1',
-                    connection_type: item.connection_type||1,
+                    connection_type: item.connection_type!==undefined?item.connection_type:0,
                     registration_package: item.registration_package||'1',
                     retry_count: item.retry_count||3,
                     check_interval: item.check_interval||3,
@@ -272,6 +273,7 @@ export  default {
             let treeDataSelected = this.deepCopy(selectedData).filter(item=> item.brand != undefined);
             let len = this.tableData.length+1;
             treeDataSelected.map((item,index)=>{
+                item.type = item.id;
                 item.id = `new${len+index}`;
                 item.amount = 1;
                 item.device = this.deviceGroups[0].id;
