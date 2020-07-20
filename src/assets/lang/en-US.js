@@ -10,7 +10,8 @@ export default {
         "NAME": "name",
         "USER": "user",
         "SELECT_ALL": "select_all",
-        "TITLE": "title"
+        "TITLE": "title",
+        "CLOSE": "close"
     },
     "LAYUI_LAYPAGE": {
         "COUNT": "count",

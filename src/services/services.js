@@ -114,3 +114,7 @@ export function deleteItemById(id) {
     return Api.deleteById(baseUrl+'setting/items/', id);
 }
 
+//获取站点管理左侧菜单
+export function devicesMenu(data={}) {
+    return Api.get(baseUrl+'device_groups/menu',data);
+}

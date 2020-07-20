@@ -10,7 +10,8 @@ export default {
         "NAME": "名称",
         "USER": "用户",
         "SELECT_ALL": "全选",
-        "TITLE": "监控系统"
+        "TITLE": "监控系统",
+        "CLOSE": "关闭"
     },
     "LAYUI_LAYPAGE": {
         "COUNT": "共 {{count}} 项",

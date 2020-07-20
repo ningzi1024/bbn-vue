@@ -80,7 +80,7 @@
                     class="pages">
             </el-pagination>
             <div slot="footer" class="dialog-footer">
-                <el-button @click.stop="btnCancel" type="primary" size="medium">关 闭</el-button>
+                <el-button @click.stop="btnCancel" type="primary" size="medium">{{ $t('COMMON.CLOSE') }}</el-button>
             </div>
         </el-dialog>
 

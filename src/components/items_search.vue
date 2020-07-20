@@ -33,7 +33,7 @@
                 <el-button slot="append" icon="el-icon-search" @click="btnSearch"></el-button>
             </el-input>
         </div>
-        <el-button icon="el-icon-delete" @click="clearInput">清除</el-button>
+        <el-button icon="el-icon-delete" @click="clearInput">{{ $t('SETTING.TABLE_TOOLBAR.DELETE') }}</el-button>
     </div>
 </template>
 
