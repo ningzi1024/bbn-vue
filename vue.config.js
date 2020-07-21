@@ -16,8 +16,8 @@ module.exports={
         port: 8080,
         proxy: {
             '/api/v1': {
-                target: 'http://192.168.1.226:8800/api/v1',
-                // target: 'http://192.168.1.54:10088/api/v1',
+                // target: 'http://192.168.1.226:8800/api/v1',
+                target: 'http://192.168.1.119/api/v1',
                 changeOrigin: true,
                 timeout: 8000,
                 pathRewrite: {

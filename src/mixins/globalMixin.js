@@ -1,5 +1,6 @@
 import moment from 'moment'
 import deepcopy from 'deepcopy'
+import Const from '../utils/const'
 export default {
     name: "globalMixin",
     created(){
@@ -264,6 +265,38 @@ export default {
          */
         deepCopy(data){
             return deepcopy(data);
+        },
+
+        /**
+         * 时间转化器
+         * @param item
+         * @param format
+         */
+        momentFormat(time, format='YYYY-MM-DD HH:mm:ss'){
+            if(!time) return;
+            if(Const.regExp.INTEGER.test(time))
+                time *= 1000;
+            return moment(time).format(format);
+        },
+
+        /**
+         * 生成持续时间字符串
+         * @param duration 持续时间的时间戳 如：263309
+         * @returns {string}
+         * 用法： getDurationString(263309) =>  03天01时09分19秒
+         */
+        getDurationString(duration){
+            if(!duration) return;
+            let days = Math.floor(duration/24/3600);
+            let hours = Math.floor(duration/3600- days*24);
+            let mins = Math.floor(duration/60- days*24*60- hours*60);
+            let seconds = Math.floor(duration- days*24*3600- hours*3600-mins*60);
+            days = days>=10?days:'0'+days;
+            hours = hours>=10?hours:'0'+hours;
+            mins = mins>=10?mins:'0'+mins;
+            seconds = seconds>=10?seconds:'0'+seconds;
+            return `${days}天${hours}时${mins}分${seconds}秒`;
         }
+
     }
 }

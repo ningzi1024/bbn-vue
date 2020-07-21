@@ -327,6 +327,7 @@ export default {
                 console.log(item);
                 if(item.isNew){
                     delete item.id;
+                    debugger
                     addDevice(item).then(res=>{
                         if(res && res.id>0) {
                             this.$message.success(`【${item.name}】保存成功！`);
@@ -521,6 +522,9 @@ export default {
             let keysTable = this.tableDataByKeys;
             try{
                 keysTable[id][`${prefix+id}`] = value;
+                if(id.indexOf('new')>-1 && prefix==='485_address_'){
+                    keysTable[id][`protocol_id_${id}`] = value;
+                }
                 keysTable[id]['editing'] = true;
                 this.globaEditing = true;
                 this.tableData = this.tableData.map(item=>{

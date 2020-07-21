@@ -6,12 +6,12 @@
                     <i class="el-icon-arrow-left"></i>
                 </div>
                 <div class="tree-con">
-
+                    <el-tree :data="treeData" :props="defaultProps" @node-click="handleNodeClick" default-expand-all></el-tree>
                 </div>
             </div>
             <div class="station-content" :class="{'smallContent':showMenu}">
                 <div class="tops">
-                    <p class="notice">当前设备：广东总部机房>温湿度1</p>
+                    <p class="notice"><span>当前设备：广东总部机房>温湿度1</span></p>
                     <ul class="tabs">
                         <li :class="{'active': curNav==='general'}" @click="curNav='general'">
                             <i class="icons icons-general"></i>
@@ -31,33 +31,49 @@
                         </li>
                     </ul>
                 </div>
-                <div class="contain">
-
-                </div>
+                <StationItems :deviceId="cur_device_id" v-show="curNav==='info'"/>
             </div>
         </div>
-        <button @click="showMenu=true">显示</button>
+<!--        <button @click="showMenu=true">显示</button>-->
     </div>
 </template>
 
 <script>
 import { Tree } from 'element-ui'
 import { devicesMenu } from '../../services/services'
+import StationItems from '../../components/Station/items'
+
 export default {
     name: 'station',
     components:{
-        [Tree.name]:Tree
+        [Tree.name]: Tree,
+        StationItems
     },
     data(){
         return {
             showMenu: true,
-            curNav: 'general'
+            curNav: 'info',
+            cur_device_id: 144,
+            treeData: [],
+            defaultProps:{
+                children: 'children',
+                label: 'name'
+            }
         }
     },
     mounted() {
         devicesMenu().then(res=>{
-            console.log(res.data);
-        })
+            let listStr = JSON.stringify(res.data);
+            listStr = listStr.replace(/categorys|devices/g,'children');
+            listStr = listStr.replace(/code/g,'id');
+            console.log(JSON.parse(listStr))
+            this.treeData = JSON.parse(listStr);
+        });
+    },
+    methods: {
+        handleNodeClick(val){
+            console.log(val);
+        }
     }
 }
 </script>
@@ -104,8 +120,13 @@ export default {
                     width 20%
                     border-top 1px solid #d5e8ea
                     font-size 15px
+                    span
+                        display inline-block
+                        padding 0 30px
+                        height 98%
+                        border-bottom  1px solid #d5e8ea
                 ul
-                    width 75%
+                    width 80%
                     border 1px solid #d5e8ea
                     display flex
                     border-right none
@@ -143,15 +164,36 @@ export default {
                                 background-image url("../../assets/images/icon_station_4_2.png")
 
 
-            table
-                background #fff
-                margin-right 20px
-                text-align center
-                margin 0 auto
-                th,td
-                    padding 10px 0
-                    border 1px solid red
-                    text-align center
+            .contain
+                height 673px
+                padding-top 30px
+                .tables
+                    min-height 555px
+                    table
+                        width 99%
+                        color #242425
+                        text-align center
+                        margin 10px auto 15px auto
+                        tr:nth-child(even)
+                            background #f1f6f7
+                        th
+                            font-weight normal
+                            font-size 12px
+                            color #7c7c7c
+                            padding 18px 0
+                            text-align center
+
+                        td
+                            padding 13px 0
+                            border-top 1px solid #d3e9ea
+                            border-bottom 1px solid #d3e9ea
+                            text-align center
+                            .normal
+                                color #0f8c07
+                            .error
+                                color #f10c0cf7
         .smallContent
             width 1720px
+    .el-tree-node__expand-icon
+        color #303030
 </style>

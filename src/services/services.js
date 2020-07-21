@@ -118,3 +118,7 @@ export function deleteItemById(id) {
 export function devicesMenu(data={}) {
     return Api.get(baseUrl+'device_groups/menu',data);
 }
+
+export function stationItems(data) {
+    return Api.get(baseUrl+'device_groups/device/item', data);
+}
