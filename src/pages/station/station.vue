@@ -62,17 +62,25 @@ export default {
         }
     },
     mounted() {
-        devicesMenu().then(res=>{
-            let listStr = JSON.stringify(res.data);
-            listStr = listStr.replace(/categorys|devices/g,'children');
-            listStr = listStr.replace(/code/g,'id');
-            console.log(JSON.parse(listStr))
-            this.treeData = JSON.parse(listStr);
-        });
+        this.getMenuList();
     },
     methods: {
-        handleNodeClick(val){
-            console.log(val);
+        handleNodeClick(item){
+            let level = item.level;
+            if(level===undefined && item.id){
+                this.cur_device_id = item.id;
+            }
+        },
+        getMenuList(){
+            devicesMenu().then(res=>{
+                let listStr = JSON.stringify(res.data);
+                listStr = listStr.replace(/,"categorys"/g,',"level":1,"categorys"');
+                listStr = listStr.replace(/,"devices"/g,',"level":2,"devices"');
+                listStr = listStr.replace(/categorys|devices/g,'children');
+                listStr = listStr.replace(/code/g,'id');
+                console.log(JSON.parse(listStr));
+                this.treeData = JSON.parse(listStr);
+            });
         }
     }
 }

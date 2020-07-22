@@ -11,6 +11,7 @@
             </el-select>
             <el-input v-model="itemsParams.item_name" placeholder="请输入监控项名称" class="input-search"/>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">搜索</el-button>
+            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>
         </div>
         <div class="tables">
             <table>
@@ -136,6 +137,7 @@ export default {
     watch:{
         deviceId(newVal){
             if(newVal){
+                this.itemsArr = [];
                 this.getItemsList();
             }
         }
@@ -154,6 +156,14 @@ export default {
         .input-search
             width 250px
             margin 0 10px
+        .warning-excel
+            display inline-block
+            color #428bca!important
+            background url('../../assets/images/excel-output.png') no-repeat 0
+            background-size: auto 100%
+            padding 0 0 0 30px
+            margin 10px 27px
+            cursor pointer
     .noDataTxt
         /*background #fff!important*/
         span
