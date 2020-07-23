@@ -31,10 +31,11 @@
                         </li>
                     </ul>
                 </div>
-                <StationItems :deviceId="cur_device_id" v-show="curNav==='info'"/>
+                <StationItems :deviceId="cur_device_id" v-if="curNav==='info'"/>
+                <StationLogs :deviceId="cur_device_id" v-if="curNav==='log'"/>
+                <StationTrend :deviceId="cur_device_id" v-if="curNav==='trend'"/>
             </div>
         </div>
-<!--        <button @click="showMenu=true">显示</button>-->
     </div>
 </template>
 
@@ -42,18 +43,22 @@
 import { Tree } from 'element-ui'
 import { devicesMenu } from '../../services/services'
 import StationItems from '../../components/Station/items'
+import StationLogs from '../../components/Station/logs'
+import StationTrend from '../../components/Station/trends'
 
 export default {
     name: 'station',
     components:{
         [Tree.name]: Tree,
-        StationItems
+        StationItems,
+        StationLogs,
+        StationTrend
     },
     data(){
         return {
             showMenu: true,
-            curNav: 'info',
-            cur_device_id: 144,
+            curNav: 'trend', //general, info, log, trend
+            cur_device_id: '',
             treeData: [],
             defaultProps:{
                 children: 'children',
@@ -172,7 +177,7 @@ export default {
                                 background-image url("../../assets/images/icon_station_4_2.png")
 
 
-            .contain
+            >.contain
                 height 673px
                 padding-top 30px
                 .tables

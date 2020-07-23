@@ -11,7 +11,8 @@ export default {
         "USER": "user",
         "SELECT_ALL": "select_all",
         "TITLE": "title",
-        "CLOSE": "close"
+        "CLOSE": "close",
+        "SEARCH": "search"
     },
     "LAYUI_LAYPAGE": {
         "COUNT": "count",

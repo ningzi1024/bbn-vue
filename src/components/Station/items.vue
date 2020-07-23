@@ -10,7 +10,7 @@
                 </el-option>
             </el-select>
             <el-input v-model="itemsParams.item_name" placeholder="请输入监控项名称" class="input-search"/>
-            <el-button type="primary" icon="el-icon-search" @click="btnSearch">搜索</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
             <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>
         </div>
         <div class="tables">
@@ -104,6 +104,7 @@ export default {
          */
         curPageChange(page){
             this.pagesParams.curPage = page;
+            this.getItemsList();
         },
         getItemsList(){
             this.itemsParams.device_id = this.deviceId;
@@ -115,6 +116,7 @@ export default {
                 list.map(item=>{
                     item[`checked_${item.item_id}`] = false;
                 })
+                this.pagesParams.total = res.total;
                 this.itemsArr = list;
             })
         },

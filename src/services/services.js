@@ -119,6 +119,20 @@ export function devicesMenu(data={}) {
     return Api.get(baseUrl+'device_groups/menu',data);
 }
 
+//站点管理--监控项
 export function stationItems(data) {
     return Api.get(baseUrl+'device_groups/device/item', data);
+}
+
+//告警日志
+export function warnLogs(data={}) {
+    return Api.get(baseUrl+'alarm_log', data);
+}
+//通知日志
+export function alarmlog(data={}) {
+    return Api.get(baseUrl+'notification_log', data);
+}
+// 获取监控线曲线数据
+export function getItemTrend(data={}) {
+    return Api.get(baseUrl+'device_groups/device/data', data);
 }
