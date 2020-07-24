@@ -27,15 +27,21 @@
                     end-placeholder="结束日期">
             </el-date-picker>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
+            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>
         </div>
-        <div class="trends">
-            <div class="myTrends" ref="myTrends" style="width: 1200px;height: 720px"></div>
-        </div>
+        <el-row>
+            <el-col :span="24">
+                <div class="trends">
+                    <div class="myTrends" ref="myTrends"></div>
+                </div>
+            </el-col>
+        </el-row>
+
     </div>
 </template>
 
 <script>
-import { Select, Option, Button, DatePicker } from 'element-ui';
+import { Select, Option, Button, DatePicker, Row, Col } from 'element-ui';
 import { getItemTrend, stationItems } from "../../services/services";
 import echarts from 'echarts'
 import globalMixin from "../../mixins/globalMixin";
@@ -52,7 +58,9 @@ export default {
         [Select.name]: Select,
         [Option.name]: Option,
         [Button.name]: Button,
-        [DatePicker.name]: DatePicker
+        [DatePicker.name]: DatePicker,
+        [Row.name]: Row,
+        [Col.name]: Col
     },
     created() {
         this.timeTypeArr = [
@@ -137,26 +145,98 @@ export default {
             let data = trendData.Data;
             data.map(item=>{
                 xAxisData.push(this.momentFormat(item.time_stamp));
-                yAxisData.push(item.value);
+                yAxisData.push(Math.floor(item.value));
             });
             let option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        label: {
+                            show: true,
+                            backgroundColor: '#fff',
+                            color: '#556677',
+                            borderColor: 'rgba(0,0,0,0)',
+                            shadowColor: 'rgba(0,0,0,0)',
+                            shadowOffsetY: 0
+                        },
+                        lineStyle: {
+                            width: 0
+                        }
+                    },
+                    backgroundColor: '#fff',
+                    textStyle: {
+                        color: '#5c6c7c'
+                    },
+                    padding: [10, 10],
+                    extraCssText: 'box-shadow: 1px 0 2px 0 rgba(163,163,163,0.5)'
+                },
+                grid: {
+                    top: '15%'
+                },
                 xAxis: {
                     type: "category",
-                    data: xAxisData
+                    data: xAxisData,
+                    axisLine: {
+                        lineStyle: {
+                            color: '#dce2e8'
+                        }
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#556677'
+                        },
+                        margin: 15
+                    },
+                    boundaryGap:true
                 },
                 yAxis: {
                     type: 'value',
-                    boundaryGap: [0, '100%'],
+                    boundaryGap: [0, '50%'],
                     splitLine: {
                         show: false
-                    }
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#dce2e8'
+                        }
+                    },
+                    axisLabel: {
+                        interval: 0,
+                        textStyle: {
+                            color: '#556677'
+                        },
+                        margin: 15
+                    },
                 },
                 series: [{
-                    name: '模拟数据',
+                    name: '数据',
                     type: 'line',
                     showSymbol: false,
-                    hoverAnimation: false,
-                    data: yAxisData
+                    symbol: 'circle',
+                    data: yAxisData,
+                    symbolSize: 1,
+                    smooth: true,
+                    lineStyle: {
+                        width: 4,
+                        color: new echarts.graphic.LinearGradient(0,1,0,0,[{
+                                offset:0,
+                                color: '#9effff'
+                            },
+                            {
+                                offset: 1,
+                                color: '#9e87ff'
+                            }
+                        ]),
+                        shadowColor: 'rgba(158,135,255,0.3)',
+                        shadowBlur: 10,
+                        shadowOffsetY:20
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: '#9E87FF',
+                            borderColor: '#9E87FF'
+                        }
+                    }
                 }]
             };
             this.myChart.setOption(option);
@@ -172,4 +252,9 @@ export default {
 .trend-search
     .selectCommon
         width 210px
+.myTrends
+    width 90%;
+    height 600px
+    margin 30px auto
+    text-align center
 </style>

@@ -2,13 +2,16 @@ import axios from 'axios'
 import Api from './apiMethods'
 
 const baseUrl = '';//'/api/v1/';
-const token = sessionStorage.getItem('token') || localStorage.getItem('token');
 const regNum = /^[0-9]*$/;
 //获取设备列表
 export function getDevices(data= {}){
     return Api.get(baseUrl+'setting/devices' ,data)
 }
-
+//获取单个设备
+export function getDeviceById(id){
+    if(!regNum.test(id)) return ;
+    return Api.get(baseUrl+'setting/devices/'+id);
+}
 //添加一项设备
 export function addDevice(data = {}) {
     return Api.post('setting/devices', data);

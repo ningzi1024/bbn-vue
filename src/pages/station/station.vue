@@ -10,60 +10,76 @@
                 </div>
             </div>
             <div class="station-content" :class="{'smallContent':showMenu}">
-                <div class="tops">
-                    <p class="notice"><span>当前设备：广东总部机房>温湿度1</span></p>
-                    <ul class="tabs">
-                        <li :class="{'active': curNav==='general'}" @click="curNav='general'">
-                            <i class="icons icons-general"></i>
-                            <span>设备概况</span>
-                        </li>
-                        <li :class="{'active': curNav==='info'}"  @click="curNav='info'">
-                            <i class="icons icons-info"></i>
-                            <span>设备详情</span>
-                        </li>
-                        <li :class="{'active': curNav==='log'}" @click="curNav='log'">
-                            <i class="icons icons-log"></i>
-                            <span>设备日志</span>
-                        </li>
-                        <li :class="{'active': curNav==='trend'}" @click="curNav='trend'">
-                            <i class="icons icons-trend"></i>
-                            <span>设备曲线</span>
-                        </li>
-                    </ul>
-                </div>
-                <StationItems :deviceId="cur_device_id" v-if="curNav==='info'"/>
-                <StationLogs :deviceId="cur_device_id" v-if="curNav==='log'"/>
-                <StationTrend :deviceId="cur_device_id" v-if="curNav==='trend'"/>
+                <el-row class="tops" v-show="!isSite">
+                    <el-col :span="5">
+                        <p class="notice"><span>当前设备：广东总部机房>温湿度1</span></p>
+                    </el-col>
+                    <el-col :span="19">
+                        <ul class="tabs">
+                            <li :class="{'active': curNav==='general'}" @click="curNav='general'">
+                                <i class="icons icons-general"></i>
+                                <span>设备概况</span>
+                            </li>
+                            <li :class="{'active': curNav==='info'}"  @click="curNav='info'">
+                                <i class="icons icons-info"></i>
+                                <span>设备详情</span>
+                            </li>
+                            <li :class="{'active': curNav==='log'}" @click="curNav='log'">
+                                <i class="icons icons-log"></i>
+                                <span>设备日志</span>
+                            </li>
+                            <li :class="{'active': curNav==='trend'}" @click="curNav='trend'">
+                                <i class="icons icons-trend"></i>
+                                <span>设备曲线</span>
+                            </li>
+                        </ul>
+                    </el-col>
+                </el-row>
+                <StationSites :hostId="hostId" v-if="isSite"/>
+                <template v-else>
+                    <StationItems :deviceId="cur_device_id" v-if="curNav==='info'"/>
+                    <StationLogs :deviceId="cur_device_id" v-if="curNav==='log'"/>
+                    <StationTrends :deviceId="cur_device_id" v-if="curNav==='trend'"/>
+                    <StationGeneral :deviceId="cur_device_id" v-if="curNav==='general'"/>
+                </template>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { Tree } from 'element-ui'
+import { Tree, Row, Col} from 'element-ui'
 import { devicesMenu } from '../../services/services'
 import StationItems from '../../components/Station/items'
 import StationLogs from '../../components/Station/logs'
-import StationTrend from '../../components/Station/trends'
+import StationTrends from '../../components/Station/trends'
+import StationSites from '../../components/Station/sites'
+import StationGeneral from '../../components/Station/generals'
 
 export default {
     name: 'station',
     components:{
         [Tree.name]: Tree,
+        [Row.name]: Row,
+        [Col.name]: Col,
         StationItems,
         StationLogs,
-        StationTrend
+        StationTrends,
+        StationSites,
+        StationGeneral
     },
     data(){
         return {
             showMenu: true,
-            curNav: 'trend', //general, info, log, trend
+            curNav: 'general', //general, info, log, trend, site
             cur_device_id: '',
             treeData: [],
             defaultProps:{
                 children: 'children',
                 label: 'name'
-            }
+            },
+            hostId: '',
+            isSite: false // 全景图
         }
     },
     mounted() {
@@ -74,6 +90,10 @@ export default {
             let level = item.level;
             if(level===undefined && item.id){
                 this.cur_device_id = item.id;
+                this.isSite = false;
+            }else if(level===1){
+                this.isSite = true;
+                this.hostId = item.id;
             }
         },
         getMenuList(){
@@ -127,19 +147,17 @@ export default {
                 width 100%
                 height 57px
                 line-height 57px
-                overflow hidden
+                /*overflow hidden*/
                 display flex
                 .notice
-                    width 20%
+                    /*width 20%*/
                     border-top 1px solid #d5e8ea
                     font-size 15px
                     span
-                        display inline-block
-                        padding 0 30px
-                        height 98%
+                        padding 16px 30px
                         border-bottom  1px solid #d5e8ea
                 ul
-                    width 80%
+                    /*width 80%*/
                     border 1px solid #d5e8ea
                     display flex
                     border-right none
