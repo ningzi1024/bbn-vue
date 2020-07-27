@@ -38,7 +38,6 @@ module.exports={
 
             '/static/mapdata': {
                 target: 'http://192.168.1.226:8800/static/mapdata',
-                // target: 'http://192.168.1.111:10088/static/mapdata',
                 changeOrigin: true,
                 timeout: 3000,
                 pathRewrite: {

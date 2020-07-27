@@ -49,12 +49,6 @@ const ApiMethods = {
             }).catch(err=>{
                 reject(err)
             })
-
-            // service({
-            //     url: url,
-            //     method: 'put',
-            //     data: params
-            // }).then(res=>resolve(res.data)).catch(err=>reject(err));
         })
     }
 }

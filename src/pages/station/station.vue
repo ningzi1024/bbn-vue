@@ -11,10 +11,15 @@
             </div>
             <div class="station-content" :class="{'smallContent':showMenu}">
                 <el-row class="tops" v-show="!isSite">
-                    <el-col :span="5">
-                        <p class="notice"><span>当前设备：广东总部机房>温湿度1</span></p>
+                    <el-col :span="1">
+                        <span>
+                            <i class="el-icon-menu" style="font-size: 22px; cursor: pointer; color: #404040" @click="showMenu=!showMenu"></i>
+                        </span>
                     </el-col>
-                    <el-col :span="19">
+                    <el-col :span="5">
+                        <p class="notice"><span>当前设备：{{ subMenus[0] }} {{ subMenus[1]?`>${subMenus[1]}`:'' }}</span></p>
+                    </el-col>
+                    <el-col :span="18">
                         <ul class="tabs">
                             <li :class="{'active': curNav==='general'}" @click="curNav='general'">
                                 <i class="icons icons-general"></i>
@@ -74,6 +79,7 @@ export default {
             curNav: 'general', //general, info, log, trend, site
             cur_device_id: '',
             treeData: [],
+            subMenus:[],
             defaultProps:{
                 children: 'children',
                 label: 'name'
@@ -86,26 +92,62 @@ export default {
         this.getMenuList();
     },
     methods: {
+        /**
+         *  树节点点击事件
+         **/
         handleNodeClick(item){
             let level = item.level;
             if(level===undefined && item.id){
                 this.cur_device_id = item.id;
                 this.isSite = false;
+                this.subMenus = this.getSubMenuText(item);
             }else if(level===1){
                 this.isSite = true;
                 this.hostId = item.id;
             }
         },
+        /**
+         * 获取左侧导航栏数据
+         */
         getMenuList(){
             devicesMenu().then(res=>{
                 let listStr = JSON.stringify(res.data);
                 listStr = listStr.replace(/,"categorys"/g,',"level":1,"categorys"');
-                listStr = listStr.replace(/,"devices"/g,',"level":2,"devices"');
                 listStr = listStr.replace(/categorys|devices/g,'children');
+                listStr = listStr.replace(/,"devices"/g,',"level":2,"devices"');
                 listStr = listStr.replace(/code/g,'id');
-                console.log(JSON.parse(listStr));
                 this.treeData = JSON.parse(listStr);
             });
+        },
+
+        /**
+         * 根据子元素获取父元素内容，递归函数
+         * @param data
+         * @returns {(string|*)[]} [父节点名称，子节点名称]
+         */
+        getSubMenuText(data){
+            let id = data.id;
+            const list = this.treeData;
+            if(!id) return;
+            let temp = [];
+            let findParentName = function (list, id){
+                list && list.map(item=>{
+                    if(item.level===1) temp.push(item.name);
+                    if(item.id === id){
+                        temp.push(item.name);
+                    } else{
+                        findParentName(item.children, id);
+                    }
+                })
+            }
+            findParentName(list, id);
+            let parent = '';
+            temp.map((item,index)=>{
+                if(item===data.name){
+                    parent = temp[index-1];
+                }
+            })
+            return [parent, data.name]
         }
     }
 }

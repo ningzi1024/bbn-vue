@@ -94,7 +94,8 @@ export default {
                 {id:3, value:'抖动'}
             ],
             statusId:'',
-            itemsArr: []     //监控项列表
+            itemsArr: [],     //监控项列表
+            timer: null
         }
     },
     methods: {
@@ -106,6 +107,9 @@ export default {
             this.pagesParams.curPage = page;
             this.getItemsList();
         },
+        /**
+         * 获取监控项列表
+         */
         getItemsList(){
             this.itemsParams.device_id = this.deviceId;
             this.itemsParams.page = this.pagesParams.curPage;
@@ -119,6 +123,11 @@ export default {
                 this.pagesParams.total = res.total;
                 this.itemsArr = list;
             })
+            if(this.timer)
+                clearTimeout(this.timer);
+            this.timer = setTimeout(()=>{
+                this.getItemsList();
+            }, 10*1000);
         },
         getStatus(id){
             if(id===1)
@@ -146,6 +155,9 @@ export default {
     },
     mounted() {
         this.getItemsList();
+    },
+    beforeDestroy() {
+        clearTimeout(this.timer);
     }
 }
 </script>
