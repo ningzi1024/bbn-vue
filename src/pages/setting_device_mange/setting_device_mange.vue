@@ -36,7 +36,7 @@
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
-                                v-model="tableDataByKeys[scope.row.id][`name_${scope.row.id}`]"
+                                v-model="scope.row[`name_${scope.row.id}`]"
                                 class="input-with-select"
                                 @input="((val)=>{inputName(val, scope.row.id, 'name_')})">
                         </el-input>
@@ -46,7 +46,7 @@
                     <template slot-scope="scope">
                         <el-select
                                 size="small"
-                                v-model="tableDataByKeys[scope.row.id][`device_group_id_${scope.row.id}`]"
+                                v-model="scope.row[`device_group_id_${scope.row.id}`]"
                                 @change="(val)=>inputName(val,scope.row.id, 'device_group_id_')"
                                 placeholder="请选择机房">
                             <el-option
@@ -71,7 +71,7 @@
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
-                                v-model="tableDataByKeys[scope.row.id][`ip_address_${scope.row.id}`]"
+                                v-model="scope.row[`ip_address_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, 'ip_address_')})">
                         </el-input>
                     </template>
@@ -80,7 +80,7 @@
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
-                                v-model="tableDataByKeys[scope.row.id][`port_${scope.row.id}`]"
+                                v-model="scope.row[`port_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, 'port_')})">
                         </el-input>
                     </template>
@@ -89,7 +89,7 @@
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
-                                v-model="tableDataByKeys[scope.row.id][`485_address_${scope.row.id}`]"
+                                v-model="scope.row[`485_address_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, '485_address_')})">
                         </el-input>
                     </template>
@@ -98,14 +98,14 @@
                     <template slot-scope="scope">
                         <el-input
                                 size="small"
-                                v-model="tableDataByKeys[scope.row.id][`registration_package_${scope.row.id}`]"
+                                v-model="scope.row[`registration_package_${scope.row.id}`]"
                                 @input="((val)=>{inputName(val, scope.row.id, 'registration_package_')})">
                         </el-input>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('SETTING.DEVICES.CONNECTION')" >
                     <template slot-scope="scope">
-                        <el-checkbox v-model="tableDataByKeys[scope.row.id][`passive_enable_${scope.row.id}`]" @change="((val)=>{inputName(val, scope.row.id, 'passive_enable_')})"></el-checkbox>
+                        <el-checkbox v-model="scope.row[`passive_enable_${scope.row.id}`]" @change="((val)=>{inputName(val, scope.row.id, 'passive_enable_')})"></el-checkbox>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('SETTING.DEVICES.CONTACT_GROUP')">
@@ -183,6 +183,8 @@ import globalMixin from "../../mixins/globalMixin";
 import Const from '../../utils/const'
 import Api from '../../services/apiMethods'
 
+const keysArr = ['name','ip_address','port','485_address','sort','passive_enable','registration_package', 'device_group_id', 'contact_groups'];
+
 export default {
     name: 'home',
     mixins:[globalMixin],
@@ -247,7 +249,6 @@ export default {
         async init(){
             this.getDevicesList();
             this.deviceGroups = await getDeviceGroups().then(res=>res.data);
-            // this.tableDataByKeys = this.getPageTableData(this.tableData);
         },
 
         /**
@@ -265,8 +266,9 @@ export default {
                 this.pages.total = res.total;
                 let list = res.data;
                 list = this.setArrItem(list, 'editing', false); //增加一个编辑状态字段
+                list = this.copyKeysByParam(list, 'id', keysArr);
+                list.map(item=> item.editing = false );
                 this.tableData = list;
-                this.tableDataByKeys = this.getPageTableData(list);
             });
         },
 
@@ -277,30 +279,6 @@ export default {
             if(!obj) return;
             this.curTdData= obj;
             this.contactGroupsShow = true;
-        },
-
-        /**
-         * 获取页面维护数据
-         */
-        getPageTableData(arr){
-            if(!arr || arr.length<=0) return {};
-            let obj = {};
-            arr.map(item=>{
-                if(!obj[item.id]){
-                    obj[item.id] = item;
-                    obj[item.id][`name_${item.id}`] = item.name;  //设备名称model
-                    obj[item.id][`ip_address_${item.id}`] = item.ip_address;  //IP地址 model
-                    obj[item.id][`port_${item.id}`] = item.port;  //端口号 model
-                    obj[item.id][`485_address_${item.id}`] = item['485_address'];  //协议id model
-                    obj[item.id][`sort_${item.id}`] = item['sort'];  //协议id model
-                    obj[item.id][`passive_enable_${item.id}`] = item['passive_enable']; //被动链接
-                    obj[item.id][`registration_package_${item.id}`] = item['registration_package']; //注册包 model
-                    obj[item.id][`device_group_id_${item.id}`] = item.device_group_id>0?item.device_group_id:"";  //设备名称model
-                    obj[item.id][`contact_groups_${item.id}`] = item.contact_groups.length>0?item.contact_groups:[];  //联系人组 model
-
-                }
-            })
-            return obj;
         },
 
         /**
@@ -327,7 +305,6 @@ export default {
                 console.log(item);
                 if(item.isNew){
                     delete item.id;
-                    debugger
                     addDevice(item).then(res=>{
                         if(res && res.id>0) {
                             this.$message.success(`【${item.name}】保存成功！`);
@@ -518,22 +495,18 @@ export default {
          * @param prefix
          */
         inputName(value,id, prefix){
-            prefix = prefix || 'name_';
-            let keysTable = this.tableDataByKeys;
-            try{
-                keysTable[id][`${prefix+id}`] = value;
-                if(id.indexOf('new')>-1 && prefix==='485_address_'){
-                    keysTable[id][`protocol_id_${id}`] = value;
-                }
-                keysTable[id]['editing'] = true;
-                this.globaEditing = true;
-                this.tableData = this.tableData.map(item=>{
-                    return keysTable[item.id]
-                });
-                this.tableDataByKeys = keysTable;
-            }catch (e) {
-                console.log(e);
-            }
+            if(!id || !prefix) return ;
+            this.tableData.map(item=>{
+                try{
+                    if(item.id === id){
+                        if(String(id).indexOf('new')>-1 && prefix==='485_address_'){
+                            item[`protocol_id_${id}`] = value;
+                        }
+                        item['editing'] = true;
+                        this.globaEditing = true;
+                    }
+                }catch (e) {console.log(e);}
+            });
 
         },
 
@@ -547,9 +520,13 @@ export default {
             if(!id) return;
             let arr = [];
             contactGroups.map(item=>arr.push(item.id));
-            this.inputName(arr, id, 'contact_group_ids_');
-            this.inputName(contactGroups, id, 'contact_groups_');
-            // console.log(this.tableData);
+            this.tableData.map(item=>{
+               if(item.id === id){
+                   item[`contact_group_ids_${id}`] = arr;
+                   item[`contact_groups_${id}`] = contactGroups;
+                   item.editing = true;
+               }
+            });
         },
 
         /**
@@ -621,14 +598,12 @@ export default {
          */
         getDeviceInfos(data){
             console.log(data, this.tableDataByKeys);
-            let { tableData } = this,
-                { newDataList } = data, //新增数据的数据源
-                obj = {};
-            obj = this.arrayToObjectById(newDataList);
+            let tableData = this.deepCopy(this.tableData),
+                { newDataList } = data; //新增数据的数据源
             newDataList.map(item=>{
                 if(item.amount>1){
                     for(let k = item.amount; k>0;k--){
-                        let localItem = Object.assign({},item,{}); //拷贝item的值到新对象中，localItem 与 item 指向不同的内存地址
+                        let localItem = this.deepCopy(item); //拷贝item的值到新对象中，localItem 与 item 指向不同的内存地址
                         localItem.id = `${item.id}_${k}`;
                         localItem.name = `${item.name}_${k}`;
                         tableData.unshift(localItem);
@@ -637,8 +612,8 @@ export default {
                     tableData.unshift(item);
             });
             this.globaEditing = true;
+            tableData = this.copyKeysByParam(tableData, 'id', keysArr);
             this.tableData = tableData;
-            this.tableDataByKeys = this.getPageTableData(tableData)
         },
 
         /**

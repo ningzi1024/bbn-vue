@@ -11,15 +11,11 @@
             </div>
             <div class="station-content" :class="{'smallContent':showMenu}">
                 <el-row class="tops" v-show="!isSite">
-                    <el-col :span="1">
-                        <span>
-                            <i class="el-icon-menu" style="font-size: 22px; cursor: pointer; color: #404040" @click="showMenu=!showMenu"></i>
-                        </span>
-                    </el-col>
                     <el-col :span="5">
+                        <i class="el-icon-menu icon-showMenu" style="font-size: 22px; cursor: pointer; color: #404040" @click="showMenu=!showMenu"></i>
                         <p class="notice"><span>当前设备：{{ subMenus[0] }} {{ subMenus[1]?`>${subMenus[1]}`:'' }}</span></p>
                     </el-col>
-                    <el-col :span="18">
+                    <el-col :span="19">
                         <ul class="tabs">
                             <li :class="{'active': curNav==='general'}" @click="curNav='general'">
                                 <i class="icons icons-general"></i>
@@ -113,8 +109,8 @@ export default {
             devicesMenu().then(res=>{
                 let listStr = JSON.stringify(res.data);
                 listStr = listStr.replace(/,"categorys"/g,',"level":1,"categorys"');
-                listStr = listStr.replace(/categorys|devices/g,'children');
                 listStr = listStr.replace(/,"devices"/g,',"level":2,"devices"');
+                listStr = listStr.replace(/categorys|devices/g,'children');
                 listStr = listStr.replace(/code/g,'id');
                 this.treeData = JSON.parse(listStr);
             });
@@ -191,12 +187,16 @@ export default {
                 line-height 57px
                 /*overflow hidden*/
                 display flex
+                .icon-showMenu
+                    position: absolute;
+                    left 10px
+                    top 18px
                 .notice
                     /*width 20%*/
                     border-top 1px solid #d5e8ea
-                    font-size 15px
+                    font-size 14px
                     span
-                        padding 16px 30px
+                        padding 16px 20px
                         border-bottom  1px solid #d5e8ea
                 ul
                     /*width 80%*/

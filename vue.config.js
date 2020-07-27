@@ -79,7 +79,8 @@ module.exports={
             'vue': 'Vue',
             'vue-router': 'VueRouter',
             'axios': 'axios',
-            'moment': 'moment'
+            'moment': 'moment',
+            'echarts': 'echarts'
         },
     }
 }

@@ -32,7 +32,10 @@
         <el-row>
             <el-col :span="24">
                 <div class="trends">
-                    <div class="myTrends" ref="myTrends"></div>
+                    <div class="myTrends" ref="myTrends" v-show="!noData"></div>
+                    <div class="nodata" v-if="noData">
+                        <img src="../../assets/images/noData.jpg" alt="">
+                    </div>
                 </div>
             </el-col>
         </el-row>
@@ -91,7 +94,8 @@ export default {
             },
             data: [],
             datePicker: '',
-            trendData: {}
+            trendData: {},
+            noData: false
         }
     },
     methods: {
@@ -130,7 +134,12 @@ export default {
             }
             getItemTrend(this.searchParams).then(res=>{
                this.trendData = res;
-               this.renderChart();
+               if(!res.Data || res.Data.length<=0)
+                   this.noData = true;
+               else {
+                   this.noData = false;
+                   this.renderChart();
+               }
             });
         },
         btnSearch(){
@@ -140,7 +149,7 @@ export default {
             let { trendData } = this;
             let xAxisData = [],
                 yAxisData = [];
-            if(trendData.Data.length<=0) return;
+            if(!trendData.Data || trendData.Data.length<=0) return;
             let data = trendData.Data;
             data.map(item=>{
                 xAxisData.push(this.momentFormat(item.time_stamp));
