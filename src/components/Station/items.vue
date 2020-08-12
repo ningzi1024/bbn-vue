@@ -47,6 +47,14 @@
                     :total="pagesParams.total" @current-change="curPageChange">
             </el-pagination>
         </div>
+<!--        https://github.com/jecovier/vue-json-excel -->
+        <download-excel
+                class   = "btn btn-default"
+                :data   = "json_data"
+                :fields = "json_fields"
+                name    = "filename.xls">
+            <img src="../../assets/images/excel-output.png" alt=""/>
+        </download-excel>
     </div>
 </template>
 
@@ -54,6 +62,7 @@
 import { Checkbox, Pagination, Select, Input, Option, Button } from 'element-ui'
 import {stationItems} from "../../services/services";
 import globalMixin from "../../mixins/globalMixin";
+import JsonExcel from 'vue-json-excel'
 
 export default {
     name: 'station-items',
@@ -69,7 +78,8 @@ export default {
         [Select.name]: Select,
         [Option.name]: Option,
         [Input.name]: Input,
-        [Button.name]: Button
+        [Button.name]: Button,
+        JsonExcel
     },
     mixins:[globalMixin],
     data(){
