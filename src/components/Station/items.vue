@@ -11,9 +11,10 @@
             </el-select>
             <el-input v-model="itemsParams.item_name" placeholder="请输入监控项名称" class="input-search"/>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
-            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>
+<!--            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>-->
+            <OutTable :id="outTableData.id" :name="outTableData.name"/>
         </div>
-        <div class="tables">
+        <div class="tables" :id="outTableData.id">
             <table>
                 <tr>
                     <th><el-checkbox v-model="selectAll"/></th>
@@ -47,14 +48,6 @@
                     :total="pagesParams.total" @current-change="curPageChange">
             </el-pagination>
         </div>
-<!--        https://github.com/jecovier/vue-json-excel -->
-        <download-excel
-                class   = "btn btn-default"
-                :data   = "json_data"
-                :fields = "json_fields"
-                name    = "filename.xls">
-            <img src="../../assets/images/excel-output.png" alt=""/>
-        </download-excel>
     </div>
 </template>
 
@@ -62,7 +55,7 @@
 import { Checkbox, Pagination, Select, Input, Option, Button } from 'element-ui'
 import {stationItems} from "../../services/services";
 import globalMixin from "../../mixins/globalMixin";
-import JsonExcel from 'vue-json-excel'
+import OutTable from '../outTable'
 
 export default {
     name: 'station-items',
@@ -79,7 +72,7 @@ export default {
         [Option.name]: Option,
         [Input.name]: Input,
         [Button.name]: Button,
-        JsonExcel
+        OutTable
     },
     mixins:[globalMixin],
     data(){
@@ -105,7 +98,11 @@ export default {
             ],
             statusId:'',
             itemsArr: [],     //监控项列表
-            timer: null
+            timer: null,
+            outTableData: {
+                id: 'tables',
+                name: '设备详情'
+            }
         }
     },
     methods: {

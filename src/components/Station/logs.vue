@@ -36,10 +36,12 @@
                     end-placeholder="结束日期">
             </el-date-picker>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
-            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>
+<!--            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>-->
+            <OutTable :id="outTableData.id" :name="outTableData.name"/>
+
         </div>
         <div class="tables">
-            <table v-show="itemType===1">
+            <table v-show="itemType===1" :id="outTableData.id">
                 <tr>
                     <th width="3%"><el-checkbox v-model="selectAll"/></th>
                     <th width="18%">时间</th>
@@ -108,6 +110,7 @@
 import { Checkbox, Pagination, Select, Input, Option, Button, DatePicker } from 'element-ui';
 import { warnLogs, alarmlog } from "../../services/services";
 import globalMixin from "../../mixins/globalMixin";
+import OutTable from '../outTable'
 export default {
     name: 'logs',
     mixins:[globalMixin],
@@ -125,6 +128,7 @@ export default {
         [Input.name]: Input,
         [Button.name]: Button,
         [DatePicker.name]: DatePicker,
+        OutTable
     },
     created() {
         this.valueTypeArr = [
@@ -168,7 +172,11 @@ export default {
                 start: '', //开始时间戳
                 end: ''  //结束时间戳
             },
-            datePicker:''
+            datePicker:'',
+            outTableData: {
+                id: 'tables',
+                name: '设备日志'
+            }
         }
     },
     watch: {
