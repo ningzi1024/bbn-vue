@@ -27,7 +27,7 @@
                     end-placeholder="结束日期">
             </el-date-picker>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
-            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>
+            <div class="warning-excel" @click="exportItemExcel">{{ $t('STATION.OUT_EXCEL') }}</div>
         </div>
         <el-row>
             <el-col :span="24">
@@ -47,6 +47,7 @@ import { Select, Option, Button, DatePicker, Row, Col } from 'element-ui';
 import { getItemTrend, stationItems } from "../../services/services";
 import echarts from 'echarts'
 import globalMixin from "../../mixins/globalMixin";
+import {exportExcel} from "../../utils/xlsxUtil";
 export default {
     name: 'trends',
     mixins:[globalMixin],
@@ -248,6 +249,17 @@ export default {
                 }]
             };
             this.myChart.setOption(option);
+        },
+        exportItemExcel(){
+            const header = {
+                time_stamp: '时间',
+                value: '值'
+            };
+            let trendData = this.deepCopy(this.trendData.Data);
+            trendData.map(item=>{
+                item.time_stamp = this.momentFormat(item.time_stamp);
+            })
+            exportExcel(trendData, header, '设备曲线.xlsx', {});
         }
     },
     mounted() {

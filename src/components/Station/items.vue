@@ -11,8 +11,11 @@
             </el-select>
             <el-input v-model="itemsParams.item_name" placeholder="请输入监控项名称" class="input-search"/>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
-<!--            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>-->
-            <OutTable :id="outTableData.id" :name="outTableData.name"/>
+            <div class="warning-excel" @click="exportItemExcel">
+                <i class="icon-excel"></i>
+                <span class="title">{{ $t('STATION.OUT_EXCEL') }}</span>
+            </div>
+<!--            <OutTable :id="outTableData.id" :name="outTableData.name"/>-->
         </div>
         <div class="tables" :id="outTableData.id">
             <table>
@@ -31,8 +34,8 @@
                     </td>
                     <td>{{ item.item_name }}</td>
                     <td><span :class="getStatus(item.status_id)">{{ item.status_label }}</span></td>
-                    <td>{{ momentFormat(item.last_check) }}</td>
-                    <td>{{ getDurationString(item.duration) }}</td>
+                    <td>{{ item.last_check }}</td>
+                    <td>{{ item.duration }}</td>
                     <td>{{ item.panding }}</td>
                     <td>{{ item.info }}</td>
                 </tr>
@@ -56,6 +59,7 @@ import { Checkbox, Pagination, Select, Input, Option, Button } from 'element-ui'
 import {stationItems} from "../../services/services";
 import globalMixin from "../../mixins/globalMixin";
 import OutTable from '../outTable'
+import { exportExcel  } from '../../utils/xlsxUtil'
 
 export default {
     name: 'station-items',
@@ -128,6 +132,10 @@ export default {
                     item[`checked_${item.item_id}`] = false;
                 })
                 this.pagesParams.total = res.total;
+                list.map(item=>{
+                    item.last_check = this.momentFormat(item.last_check);
+                    item.duration = this.getDurationString(item.duration);
+                })
                 this.itemsArr = list;
             })
             if(this.timer)
@@ -150,6 +158,18 @@ export default {
         changeStatus(id){
             this.statusId = id;
             this.getItemsList();
+        },
+        /***/
+        exportItemExcel(){
+            const header = {
+                item_name: '监控项',
+                status_label: '状态',
+                last_check: '最近检查',
+                duration: '持续时间',
+                panding: '报警缓冲',
+                info: '信息'
+            };
+            exportExcel(this.itemsArr, header, '监控项列表.xlsx', {});
         }
     },
     watch:{
@@ -178,13 +198,21 @@ export default {
             width 250px
             margin 0 10px
         .warning-excel
-            display inline-block
+            display flex
             color #428bca!important
-            background url('../../assets/images/excel-output.png') no-repeat 0
-            background-size: auto 100%
-            padding 0 0 0 30px
-            margin 10px 27px
+            text-align right
+            margin 5px 27px
             cursor pointer
+            overflow hidden
+            .icon-excel
+                display inline-block
+                width 28px
+                padding 13px 0
+                margin-right 15px
+                background url('../../assets/images/excel-output.png') no-repeat 0
+                background-size: 100% auto, cover;
+            .title
+                margin-top 8px
     .noDataTxt
         /*background #fff!important*/
         span

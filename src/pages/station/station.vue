@@ -156,12 +156,14 @@ export default {
     .main
         display flex
         .station-menu
-            width 177px
+            width 277px
             height 730px
             background #fefeff
-            transition: margin-left .3s;
-            margin-left  -180px
+            transition: margin-left .3s
+            margin-left  -280px
             box-shadow 5px 0 15px rgba(39,50,71,0.13)
+            overflow-x hidden
+            overflow-y auto
             .hide-menu-wrap
                 text-align left
                 width 100%
@@ -266,7 +268,7 @@ export default {
                             .error
                                 color #f10c0cf7
         .smallContent
-            width 1720px
+            width 1620px
     .el-tree-node__expand-icon
         color #303030
 </style>

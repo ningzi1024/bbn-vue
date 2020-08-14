@@ -36,12 +36,12 @@
                     end-placeholder="结束日期">
             </el-date-picker>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
-<!--            <div class="warning-excel">{{ $t('STATION.OUT_EXCEL') }}</div>-->
-            <OutTable :id="outTableData.id" :name="outTableData.name"/>
+            <div class="warning-excel" @click="exportItemExcel">{{ $t('STATION.OUT_EXCEL') }}</div>
+<!--            <OutTable :id="outTableData.id" :name="outTableData.name"/>-->
 
         </div>
         <div class="tables">
-            <table v-show="itemType===1" :id="outTableData.id">
+            <table v-show="itemType===1">
                 <tr>
                     <th width="3%"><el-checkbox v-model="selectAll"/></th>
                     <th width="18%">时间</th>
@@ -54,7 +54,7 @@
                 </tr>
                 <tr v-for="item in tableData" :key="item.time">
                     <td><el-checkbox v-model="item[`checked_${item.time}`]"/></td>
-                    <td>{{ momentFormat(item.time) }}</td>
+                    <td>{{ item.time }}</td>
                     <td>{{ item.device }}</td>
                     <td>{{ item.item }}</td>
                     <td>{{ item.status_label }}</td>
@@ -81,7 +81,7 @@
 
                 <tr v-for="item in tableData" :key="item.time">
                     <td><el-checkbox v-model="item[`checked_${item.time}`]"/></td>
-                    <td>{{ momentFormat(item.time) }}</td>
+                    <td>{{ item.time }}</td>
                     <td>{{ item.name }}</td>
                     <td>{{ item.device }}</td>
                     <td>{{ item.item }}</td>
@@ -110,7 +110,7 @@
 import { Checkbox, Pagination, Select, Input, Option, Button, DatePicker } from 'element-ui';
 import { warnLogs, alarmlog } from "../../services/services";
 import globalMixin from "../../mixins/globalMixin";
-import OutTable from '../outTable'
+import { exportExcel } from "../../utils/xlsxUtil";
 export default {
     name: 'logs',
     mixins:[globalMixin],
@@ -127,8 +127,7 @@ export default {
         [Option.name]: Option,
         [Input.name]: Input,
         [Button.name]: Button,
-        [DatePicker.name]: DatePicker,
-        OutTable
+        [DatePicker.name]: DatePicker
     },
     created() {
         this.valueTypeArr = [
@@ -172,11 +171,7 @@ export default {
                 start: '', //开始时间戳
                 end: ''  //结束时间戳
             },
-            datePicker:'',
-            outTableData: {
-                id: 'tables',
-                name: '设备日志'
-            }
+            datePicker:''
         }
     },
     watch: {
@@ -263,6 +258,7 @@ export default {
             warnLogs(searchParams).then(res=>{
                 res.data && res.data.map(item=>{
                     item[`checked_${item.time}`] = false;
+                    item.time = this.momentFormat(item.time)
                 })
                 this.tableData = res.data;
                 this.pagesParams.total = res.total;
@@ -273,11 +269,16 @@ export default {
             alarmlog(searchParams).then(res=>{
                 res.data && res.data.map(item=>{
                     item[`checked_${item.time}`] = false;
+                    item.time = this.momentFormat(item.time)
                 })
                 this.tableData = res.data;
                 this.pagesParams.total = res.total;
             });
         },
+        /**
+         * 获取请求参数
+         * @returns {default.methods.searchParams}
+         */
         getParams(){
             let { searchParams, pagesParams, datePicker } = this;
             searchParams.limit = pagesParams.pages;
@@ -295,6 +296,33 @@ export default {
                 searchParams.end = '';
             }
             return searchParams;
+        },
+        /**
+         * 导出Excel表
+         */
+        exportItemExcel(){
+            let fileName = this.itemType===1?'告警日志':'通知日志';
+            const warnHeader = {
+                time: '时间',
+                device: '设备名称',
+                item: '触发的监控项',
+                status_label: '触发时的状态',
+                panding: '尝试次数',
+                info: '详细信息',
+                threshold: '阈值'
+            };
+            const noticeHeader = {
+                time: '时间',
+                name: '联系人名称',
+                device: '设备名称',
+                item: '触发的监控项',
+                status_label: '触发时的状态',
+                cmd: '执行的动作',
+                info: '详细信息',
+                threshold: '阈值'
+            };
+            let header = this.itemType ===1?warnHeader:noticeHeader;
+            exportExcel(this.tableData, header, fileName+'.xlsx', {});
         }
     }
 }

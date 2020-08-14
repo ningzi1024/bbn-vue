@@ -1,5 +1,5 @@
 <template>
-    <div class="export-excel" @click="exportExcel2">{{ $t('STATION.OUT_EXCEL') }}</div>
+    <div class="export-excel" @click="exportExcel">{{ $t('STATION.OUT_EXCEL') }}</div>
 </template>
 
 <script>
@@ -33,29 +33,6 @@
                 var wbout = XLSX.write(wb, {
                     bookType: 'xlsx',
                     bookSST: true,
-                    type: 'array'
-                })
-                try {
-                    FileSaver.saveAs(
-                        new Blob([wbout], {
-                            type: 'application/octet-stream'
-                        }),
-                        this.name + '.xlsx'
-                    )
-                } catch (e) {
-                    if (typeof console !== 'undefined') console.log(e, wbout)
-                }
-                return wbout
-            },
-            exportExcel2(){
-                var xlsxParam = { raw: true }
-                var wb = XLSX.utils.table_to_book(
-                    document.querySelector('#' + this.id),
-                    xlsxParam
-                )
-                var wbout = XLSX.write(wb, {
-                    bookType: 'xlsx',
-                    bookSST: false,
                     type: 'array'
                 })
                 try {

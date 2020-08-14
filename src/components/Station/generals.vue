@@ -30,14 +30,14 @@ export default {
     },
     created() {
         this.leftImgs = {
-            2: require('../../assets/images/temp_th_left_02.jpg'),  //温湿度
-            19: require('../../assets/images/temp_th_left_19.jpg'), //电量仪
+            2: require('../../assets/images/temp_th_left_19.jpg'),  //温湿度
+            19: require('../../assets/images/temp_th_left_02.jpg'), //电量仪
             3: require('../../assets/images/temp_th_left_03.jpg'),  //UPS
             9: require('../../assets/images/temp_th_left_9.jpg')   //精密空调
         };
         this.rightImgs = {
-            2: require('../../assets/images/temp_th_right_02.jpg'),
-            19: require('../../assets/images/temp_th_right_19.jpg'),
+            2: require('../../assets/images/temp_th_right_19.jpg'),
+            19: require('../../assets/images/temp_th_right_02.jpg'),
             3: require('../../assets/images/temp_th_right_03.jpg'),
             9: require('../../assets/images/temp_th_right_9.jpg')
         };
