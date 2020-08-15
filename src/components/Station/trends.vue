@@ -27,7 +27,10 @@
                     end-placeholder="结束日期">
             </el-date-picker>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
-            <div class="warning-excel" @click="exportItemExcel">{{ $t('STATION.OUT_EXCEL') }}</div>
+            <div class="warning-excel-new" @click="exportItemExcel">
+                <i class="icon-excel"></i>
+                <span class="title">{{ $t('STATION.OUT_EXCEL') }}</span>
+            </div>
         </div>
         <el-row>
             <el-col :span="24">
@@ -277,4 +280,20 @@ export default {
     height 600px
     margin 30px auto
     text-align center
+.warning-excel-new
+    display flex
+    color #428bca!important
+    text-align right
+    margin 5px 27px
+    cursor pointer
+    overflow hidden
+    .icon-excel
+        display inline-block
+        width 28px
+        padding 13px 0
+        margin-right 15px
+        background url('../../assets/images/excel-output.png') no-repeat 0
+        background-size: 100% auto, cover;
+    .title
+        margin-top 8px
 </style>

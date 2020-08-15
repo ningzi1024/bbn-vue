@@ -11,7 +11,7 @@
             </el-select>
             <el-input v-model="itemsParams.item_name" placeholder="请输入监控项名称" class="input-search"/>
             <el-button type="primary" icon="el-icon-search" @click="btnSearch">{{ $t('COMMON.SEARCH') }}</el-button>
-            <div class="warning-excel" @click="exportItemExcel">
+            <div class="warning-excel-new" @click="exportItemExcel">
                 <i class="icon-excel"></i>
                 <span class="title">{{ $t('STATION.OUT_EXCEL') }}</span>
             </div>
@@ -197,7 +197,7 @@ export default {
         .input-search
             width 250px
             margin 0 10px
-        .warning-excel
+        .warning-excel-new
             display flex
             color #428bca!important
             text-align right
