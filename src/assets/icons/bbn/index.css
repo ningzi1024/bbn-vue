@@ -1,0 +1,318 @@
+@font-face {
+    font-family: 'iconfont';
+    src: url('font/icon/iconfont.eot');
+    /* IE9 */
+    src: url('font/icon/iconfont.eot') format('embedded-opentype'),
+        /* IE6-IE8 */
+        url('font/icon/iconfont.woff') format('woff'), url('font/icon/iconfont.ttf') format('truetype'),
+        /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+        url('font/icon/iconfont.svg') format('svg');
+    /* iOS 4.1- */
+}
+.iconfont {
+    font-family: 'iconfont' !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.data-pie:before {
+    content: "\e645";
+}
+.water-drop:before {
+    content: "\e613";
+}
+.home:before {
+    content: "\e608";
+}
+.other:before {
+    content: "\e61b";
+}
+.dehumidification:before {
+    content: "\e60a";
+}
+.water-level:before {
+    content: "\e622";
+}
+.alternator:before {
+    content: "\e63c";
+}
+.switch:before {
+    content: "\e61c";
+}
+.subtract:before {
+    content: "\e643";
+}
+.Air-conditioner-cabinet:before {
+    content: "\e633";
+}
+.reader:before {
+    content: "\e600";
+}
+.asset-management:before {
+    content: "\e60e";
+}
+.water-leakage:before {
+    content: "\e617";
+}
+.jump:before {
+    content: "\e641";
+}
+.ok:before {
+    content: "\e604";
+}
+.air-filter:before {
+    content: "\e60b";
+}
+.setup:before {
+    content: "\e68e";
+}
+.electric-quantity:before {
+    content: "\e60c";
+}
+.password:before {
+    content: "\e6c5";
+}
+.refrigeration:before {
+    content: "\e684";
+}
+.heating:before {
+    content: "\e687";
+}
+.determine:before {
+    content: "\e60d";
+}
+.weChat:before {
+    content: "\e635";
+}
+.ringing:before {
+    content: "\e650";
+}
+.data-table:before {
+    content: "\e63f";
+}
+.environment:before {
+    content: "\e609";
+}
+.plus:before {
+    content: "\e602";
+}
+.cloudHost:before {
+    content: "\e615";
+}
+.UPS:before {
+    content: "\e612";
+}
+.scanning:before {
+    content: "\e663";
+}
+.video:before {
+    content: "\e607";
+}
+.network:before {
+    content: "\e67d";
+}
+.internet:before {
+    content: "\e64a";
+}
+.temperature-humidity:before {
+    content: "\e619";
+}
+.noise:before {
+    content: "\e843";
+}
+.dust:before {
+    content: "\e86d";
+}
+.cabinet:before {
+    content: "\e65d";
+}
+.application:before {
+    content: "\e665";
+}
+.daily-record:before {
+    content: "\e627";
+}
+.refresh:before {
+    content: "\e605";
+}
+.cancel:before {
+    content: "\e653";
+}
+.customer-service:before {
+    content: "\e601";
+}
+.save:before {
+    content: "\e6dd";
+}
+.anfang:before {
+    content: "\e614";
+}
+.language:before {
+    content: "\e692";
+}
+.log:before {
+    content: "\e674";
+}
+.battery:before {
+    content: "\e61e";
+}
+.adapter:before {
+    content: "\e69d";
+}
+.humidifier:before {
+    content: "\e63d";
+}
+.mute:before {
+    content: "\e651";
+}
+.question:before {
+    content: "\e61f";
+}
+.bullet-box:before {
+    content: "\e6ed";
+}
+.waters-drop:before {
+    content: "\e621";
+}
+.-:before {
+    content: "\e616";
+}
+.monitor:before {
+    content: "\e679";
+}
+.data-curve:before {
+    content: "\e61d";
+}
+.guidelines:before {
+    content: "\e6e5";
+}
+.overview:before {
+    content: "\e603";
+}
+.thermometer:before {
+    content: "\e6fc";
+}
+.search:before {
+    content: "\e782";
+}
+.alipay:before {
+    content: "\e623";
+}
+.administrator:before {
+    content: "\e64b";
+}
+.camera:before {
+    content: "\e624";
+}
+.notebook:before {
+    content: "\e714";
+}
+.lightning:before {
+    content: "\e625";
+}
+.tool:before {
+    content: "\e620";
+}
+.illumination:before {
+    content: "\e62d";
+}
+.navigation:before {
+    content: "\e652";
+}
+.alarm:before {
+    content: "\e657";
+}
+.airconditioning:before {
+    content: "\e664";
+}
+.shutdown:before {
+    content: "\e74d";
+}
+.telescopic-right:before {
+    content: "\e6aa";
+}
+.windspeed:before {
+    content: "\e629";
+}
+.host:before {
+    content: "\e6cd";
+}
+.access-control:before {
+    content: "\e68b";
+}
+.back:before {
+    content: "\e611";
+}
+.batch:before {
+    content: "\e660";
+}
+.map:before {
+    content: "\e671";
+}
+.increase-engineroom:before {
+    content: "\e68a";
+}
+.full-screen:before {
+    content: "\e773";
+}
+.measuring:before {
+    content: "\e640";
+}
+.control:before {
+    content: "\e618";
+}
+.mail:before {
+    content: "\e66c";
+}
+.HD:before {
+    content: "\e65c";
+}
+.telescopic-left:before {
+    content: "\e631";
+}
+.big-screen:before {
+    content: "\e6f5";
+}
+.data-bar:before {
+    content: "\e610";
+}
+.inspection:before {
+    content: "\e60f";
+}
+.position:before {
+    content: "\e62a";
+}
+.user:before {
+    content: "\e6d0";
+}
+.delete:before {
+    content: "\e6cf";
+}
+.quit:before {
+    content: "\e626";
+}
+.horn:before {
+    content: "\e667";
+}
+.data-curves:before {
+    content: "\e8b3";
+}
+.close:before {
+    content: "\e63e";
+}
+.play:before {
+    content: "\e63a";
+}
+.energy-management:before {
+    content: "\e634";
+}
+.Ch:before {
+    content: "\e72d";
+}
+.En:before {
+    content: "\e72e";
+}
+.temperature-sensor:before {
+    content: "\e6b6";
+}

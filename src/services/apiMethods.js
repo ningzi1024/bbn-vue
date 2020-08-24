@@ -1,5 +1,4 @@
 import service from './apiBase'
-import QS from 'qs';
 
 const ApiMethods = {
     get(url, params){
@@ -15,7 +14,7 @@ const ApiMethods = {
     },
     post(url, params){
         return new Promise((resolve, reject)=>{
-            service.post(url, QS.stringify(params)).then(res=>{
+            service.post(url, params).then(res=>{
                 resolve(res.data)
             }).catch(err=>{
                 reject(err)
@@ -45,7 +44,11 @@ const ApiMethods = {
     },
     put(url, params){
         return new Promise((resolve, reject)=>{
-            service.put(url, params).then(res=>resolve(res.data)).catch(err=>reject(err))
+            service.put(url, params).then(res=>{
+                resolve(res.data)
+            }).catch(err=>{
+                reject(err)
+            })
         })
     }
 }

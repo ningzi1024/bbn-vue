@@ -1,26 +1,24 @@
-import axios from 'axios'
 import Api from './apiMethods'
-const baseUrl = '/api/v1/';
-const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-const headers = {
-    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-    'Authorization':'Bearer ' + token
-};
+
+const baseUrl = '';//'/api/v1/';
 const regNum = /^[0-9]*$/;
+
+//获取左侧菜单栏
+export function menuList() {
+    return Api.get(baseUrl+'menus');
+}
 //获取设备列表
 export function getDevices(data= {}){
     return Api.get(baseUrl+'setting/devices' ,data)
 }
-
+//获取单个设备
+export function getDeviceById(id){
+    if(!regNum.test(id)) return ;
+    return Api.get(baseUrl+'setting/devices/'+id);
+}
 //添加一项设备
 export function addDevice(data = {}) {
-    //apiMethods 内post 方法需要优化，暂时用这个
-    return axios({
-        method: 'post',
-        url: baseUrl+'setting/devices',
-        data: data,
-        headers:headers
-    });
+    return Api.post('setting/devices', data);
 }
 
 //获取联系人组数据
@@ -66,13 +64,7 @@ export function deleteDevice(data={}) {
 export function updateDevice(data= {}) {
     const id = data.id;
     if(!id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
-    // return Api.put(baseUrl+'setting/devices/'+ id, data);
-    return axios({
-        method: 'put',
-        url: baseUrl+'setting/devices/'+id,
-        data: data,
-        headers: headers
-    });
+    return Api.put(baseUrl+'setting/devices/'+ id, data);
 }
 
 /**
@@ -113,15 +105,34 @@ export function updateItem(data = {}) {
     if(!data || !id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
     let params = {...data};
     delete params.id;
-    return axios({
-        method: 'put',
-        url: baseUrl+'setting/items/'+id,
-        data: params,
-        headers: headers
-    });
+    return Api.put(baseUrl+'setting/devices/'+ id, params);
 }
 
+//删除监控项
 export function deleteItemById(id) {
     if(!id || !regNum.test(id)) throw 'id 不存在或者不是是数字';
     return Api.deleteById(baseUrl+'setting/items/', id);
+}
+
+//获取站点管理左侧菜单
+export function devicesMenu(data={}) {
+    return Api.get(baseUrl+'device_groups/menu',data);
+}
+
+//站点管理--监控项
+export function stationItems(data) {
+    return Api.get(baseUrl+'device_groups/device/item', data);
+}
+
+//告警日志
+export function warnLogs(data={}) {
+    return Api.get(baseUrl+'alarm_log', data);
+}
+//通知日志
+export function alarmlog(data={}) {
+    return Api.get(baseUrl+'notification_log', data);
+}
+// 获取监控线曲线数据
+export function getItemTrend(data={}) {
+    return Api.get(baseUrl+'device_groups/device/data', data);
 }

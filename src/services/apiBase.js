@@ -1,47 +1,66 @@
 import axios from 'axios'
-
+import route from '../router/index'
 const dev = "development";
 
-const apiConfig = {
-    baseURL: '',
-    timeout: 10000,
-    headers:{
-        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-    },
-    transformRequest:[function(data,headers){
-        let token = localStorage.getItem('token');
-        let isDev = process.env.NODE_ENV==dev;
-        if(isDev){
-            // token = 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTI5MDE2NzYsImlhdCI6MTU5MjE4MTY3NiwibmJmIjoxNTkyMTgxNjc2LCJzdWIiOiIxIn0.dmpliSthD4zrt7injtEnS5yVithI_JqSF60IHDT6PB41gKjntmpwEJepMtRLuLIkj5xdt9dzKqNQYaP89cXe6w'
-            headers['x-custom-authtoken'] = 'MjFmNzg2YWFlN2FlZmEzOWEzNDA3MjIwOGI2NWYwNTU=';
-        }
-        if(token)
-            headers.Authorization = 'Bearer ' + token;
-        return data;
-    }],
-    transformResponse:[function(response){
-        if(typeof response === 'string'){
-            try {
-                response = JSON.parse(response);
-            }catch (e) {
-                console.log('解析失败');
-            }
-        }
+const instance = axios.create({
+    baseURL: '/api/v1/',
+    timeout: 10000
+});
 
-        if(response.status && response.status === 200){
-            return response;
-        }else
-        if (response.status && response.status === 500 || response.status === 502 || response.status === 404) {
+/**
+ * 请求拦截器设置
+ */
+instance.interceptors.request.use(config=>{
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    let isDev = process.env.NODE_ENV==dev;
+    if(isDev){
+        config.headers['x-custom-authtoken'] = 'MjFmNzg2YWFlN2FlZmEzOWEzNDA3MjIwOGI2NWYwNTU=';
+    }
+    if(token)
+        config.headers.Authorization = 'Bearer ' + token;
+    return config;
+},error=>{
+    console.error(error);
+});
+
+/**
+ * 相应拦截器设置
+ */
+instance.interceptors.response.use(response=>{
+    if(typeof response === 'string'){
+        try {
+            response = JSON.parse(response);
+        }catch (e) {
+            console.log('解析失败');
+        }
+    }
+    if(response.status && response.status === 200){
+        return response;
+    }else
+    if (response.status && response.status === 500 || response.status === 502 || response.status === 404) {
             this.$message({
                 type: "error",
                 showClose: true,
                 message: '网络异常，请稍后重试！'
             })
-        }else{
-            return response;
-        }
-    }]
-};
+    }else{
+        return response;
+    }
+}, error=>{
+    console.error('请求失败',error);
+    errorEvent(error.response);
+    return error;
+});
 
-const instance  = axios.create(apiConfig);
+/**
+ * 处理捕获的异常
+ * @param error
+ */
+function errorEvent(error){
+    if(!error) return;
+    if(error.status===401){
+        route.push('/login');
+    }
+}
+
 export default instance;
