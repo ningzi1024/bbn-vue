@@ -9,6 +9,7 @@
                 @open="handleOpen"
                 @close="handleClose"
                 :default-openeds="openeds"
+                :collapse="isCollapse"
                 active-text-color="#666">
             <RecursiveMenu v-for="(menu,index) in menuList" :key="`${menu.index}-${index}`" :item="menu"/>
         </el-menu>
@@ -16,7 +17,7 @@
 </template>
 
 <script>
-import {Menu} from 'element-ui'
+import { Menu} from 'element-ui'
 
 import RecursiveMenu from './recursiveMenu'
 export default {
@@ -26,6 +27,10 @@ export default {
             type: Array,
             require: true,
             default: ()=>[]
+        },
+        isCollapse: {
+            type: Boolean,
+            default: true
         }
     },
     components:{
@@ -34,7 +39,6 @@ export default {
     },
     data(){
       return {
-          isCollapse: false,
           openeds: [],
           defaultIndex: '总览'
       }
@@ -60,15 +64,23 @@ export default {
 
 <style lang="stylus">
 .zl-sidebar-container
-    height 800px
-    overflow-x hidden
-    overflow-y auto
-    .el-submenu .el-menu-item
-        padding 0;
-    .el-submenu__title, .el-menu-item
-        text-align left
-    .el-submenu__title i, .el-menu-item i
-        display inline-block
-        margin-left 30px
-
+    margin 0 auto
+    .my-menu
+        width 100%
+        height 800px
+        overflow-x hidden
+        overflow-y auto
+        .el-submenu .el-menu-item
+            padding 0;
+        .el-submenu__title, .el-menu-item
+            text-align left
+        .el-submenu__title i, .el-menu-item i
+            display inline-block
+            margin 0 18px 0 25px
+            font-size 16px
+            color #666
+        .el-icon-arrow-right
+            right -18px
+            top 40%
+            font-size 15px!important
 </style>

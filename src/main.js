@@ -6,6 +6,7 @@ import { Message, MessageBox } from 'element-ui'
 
 import './assets/style/reset.css'
 import './assets/style/app.styl'
+import './assets/icons/bbn/index.css'
 
 Vue.config.productionTip = false
 Vue.prototype.$message = Message

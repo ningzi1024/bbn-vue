@@ -175,9 +175,9 @@
 .waters-drop:before {
     content: "\e621";
 }
-.-:before {
-    content: "\e616";
-}
+/*.-:before {*/
+/*    content: "\e616";*/
+/*}*/
 .monitor:before {
     content: "\e679";
 }
